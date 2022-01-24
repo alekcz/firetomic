@@ -14,11 +14,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v2
       
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@3.7
+        with:
+          cli: latest 
+          lein: latest   
+          boot: latest   
+
       - name: Cache deps
         uses: actions/cache@v1
         id: cache-deps
