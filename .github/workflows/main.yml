@@ -30,7 +30,7 @@ jobs:
 
       - name: Cache firebase
         uses: actions/cache@v1
-        id: cache-deps
+        id: cache-firebase
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-maven-${{ hashFiles('deps.edn') }}
