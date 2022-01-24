@@ -13,10 +13,10 @@
 (def current-commit (gh/current-commit))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
-(def jar-path (format "target/%s-%s.jar" (name lib) version))
-(def uber-file (format "%s-%s-standalone.jar" (name lib) version))
+(def jar-path (format "target/firetomic-%s.jar" version))
+(def uber-file (format "firetomic-%s-standalone.jar" version))
 (def uber-path (format "target/%s" uber-file))
-(def image (format "docker.io/replikativ/datahike-server:%s" version))
+(def image (format "docker.io/alekcz/firetomic:%s" version))
 
 (defn get-version
   [_]

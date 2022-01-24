@@ -1,6 +1,6 @@
 # Datahike Server
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freplikativ%2Fdatahike-server%2Fmaster%2Fazuredeploy.json)
+[![CI](https://github.com/alekcz/firetomic/actions/workflows/main.yml/badge.svg)](https://github.com/alekcz/firetomic/actions/workflows/main.yml)
 
 With Datahike Server you can run your Datahike with a REST interface. Deploy
 Datahike with the backend of your choice and run it in a container or on a VM.

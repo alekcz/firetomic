@@ -32,22 +32,31 @@
   [config-file]
   (let [config-from-file (load-config-file config-file)
         server-config (merge
-                       {:port (int-from-env :datahike-server-port 3000)
-                        :join? (bool-from-env :datahike-server-join? false)
-                        :loglevel (keyword (:datahike-server-loglevel env :info))
-                        :dev-mode (bool-from-env :datahike-server-dev-mode false)}
+                       {:port (int-from-env :port (int-from-env :firetomic-port 3000)) 
+                        :join? (bool-from-env :firetomic-join? false)
+                        :loglevel (keyword (:firetomic-loglevel env :info))
+                        :dev-mode (bool-from-env :firetomic-dev-mode false)}
                        (:server config-from-file))
-        token-config (if-let [token (keyword (:datahike-server-token env))]
+        token-config (if-let [token (keyword (:firetomic-token env))]
                        (merge
-                        {:token (keyword (:datahike-server-token env))}
+                        {:token (keyword (:firetomic-token env))}
                         server-config)
                        server-config)
         validated-server-config (if (s/valid? ::server-config token-config)
                                   token-config
                                   (throw (ex-info "Server configuration error:" (s/explain-data ::server-config token-config))))
-        datahike-configs (:databases config-from-file)]
+        firetomic-config  {:store { :backend :firebase 
+                                    :db (env :firetomic-firebase-url)
+                                    :root (env :firetomic-name)
+                                    :env "FIRETOMIC_FIREBASE_AUTH"}
+                            :name (env :firetomic-name env)
+                            :keep-history? (bool-from-env :firetomic-keep-history false) 
+                            :schema-flexibility (or (keyword (env :firetomic-schema-flexibility)) 
+                                                    :read)}
+                                                         
+        firetomic-configs (into [] (concat [firetomic-config] (:databases config-from-file)))]
     {:server validated-server-config
-     :databases datahike-configs}))
+     :databases firetomic-configs}))
 
 (defstate config
   :start (do

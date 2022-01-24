@@ -13,7 +13,8 @@
 
  :paths ["src/clj"]
 
- :aliases {:test {:extra-paths ["test"]
+ :aliases {:run {:ns-default datahike-server.core :exec-fn -main}
+           :test {:extra-paths ["test"]
                   :extra-deps {clj-http/clj-http {:mvn/version"3.12.3"}
                                lambdaisland/kaocha {:mvn/version "1.60.972"}
                                lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}}
@@ -26,7 +27,7 @@
                                org.clojure/tools.namespace {:mvn/version "1.2.0"}}
                   :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
 
-           :build {:deps {io.github.clojure/tools.build {:git/tag "v0.6.6" :git/sha "4d41c26"}
+           :build {:deps {io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
                           slipset/deps-deploy {:mvn/version "0.2.0"}
                           borkdude/gh-release-artifact {:git/url "https://github.com/borkdude/gh-release-artifact"
                                                         :sha "2f8898d84126a4e922c490f8614211a8b0cf67cd"}
