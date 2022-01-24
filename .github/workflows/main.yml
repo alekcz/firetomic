@@ -27,6 +27,15 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('deps.edn') }}
           restore-keys: |
                 ${{ runner.os }}-maven-
+
+      - name: Cache firebase
+        uses: actions/cache@v1
+        id: cache-deps
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-maven-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+                ${{ runner.os }}-firebase-
       
       - name: Run tests
         run: |
