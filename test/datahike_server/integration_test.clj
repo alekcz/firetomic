@@ -55,8 +55,7 @@
               :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}
              {:store {:backend :firebase 
                       :db "http://localhost:9000/firetomic-test" 
-                      :root "firetomic"
-                      :env "FIRE"},
+                      :root "firetomic"},
               :keep-history? true,
               :schema-flexibility :write,
               :name "users",

@@ -4,9 +4,9 @@
               :keep-history? false
               :name "sessions"}
              {:store {:backend :firebase 
-                      :db "https://project-id..firebaseio.com/prod" 
+                      :db "https://project-id.firebaseio.com/prod" 
                       :root "firetomic"
-                      :env "FIRE"}
+                      :env "GOOGLE_APPLICATION_CREDENTIALS"}
               :name "users"
               :keep-history? true
               :schema-flexibility :write}]
