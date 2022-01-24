@@ -53,7 +53,10 @@
               :attribute-refs? false,
               :cache-size 100000,
               :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}
-             {:store {:path "/tmp/dh-file", :backend :file},
+             {:store {:backend :firebase 
+                      :db "http://localhost:9000/firetomic-test" 
+                      :root "firetomic"
+                      :env "FIRE"},
               :keep-history? true,
               :schema-flexibility :write,
               :name "users",

@@ -2,6 +2,7 @@
   (:require [datahike-server.database :refer [conns]]
             [datahike.api :as d]
             [datahike.db :as dd]
+            [datahike-firebase.core]
             [datahike.core :as c]))
 
 (defn success

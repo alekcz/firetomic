@@ -2,6 +2,7 @@
   (:require [mount.core :refer [defstate stop start]]
             [taoensso.timbre :as log]
             [datahike-server.config :refer [config]]
+            [datahike-firebase.core]
             [datahike.api :as d])
   (:import [java.util UUID]))
 

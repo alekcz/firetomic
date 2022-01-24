@@ -3,6 +3,7 @@
             [datahike-server.config :refer [config]]
             [datahike-server.database :refer [conns]]
             [datahike-server.middleware :as middleware]
+            [datahike-firebase.core]
             [datahike.api :as d]
             [reitit.ring :as ring]
             [reitit.coercion.spec]

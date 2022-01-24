@@ -3,8 +3,10 @@
               :schema-flexibility :read
               :keep-history? false
               :name "sessions"}
-             {:store {:backend :file
-                      :path "/tmp/dh-file"}
+             {:store {:backend :firebase 
+                      :db "https://project-id..firebaseio.com/prod" 
+                      :root "firetomic"
+                      :env "FIRE"}
               :name "users"
               :keep-history? true
               :schema-flexibility :write}]

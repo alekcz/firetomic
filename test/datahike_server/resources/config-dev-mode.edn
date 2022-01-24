@@ -5,8 +5,9 @@
               :schema-flexibility :read
               :keep-history? false
               :name "sessions"}
-             {:store {:backend :file
-                      :path "/tmp/dh-file"}
+             {:store {:backend :firebase 
+                      :db "http://localhost:9000/firetomic-test" 
+                      :root "firetomic"}
               :name "users"
               :keep-history? true
               :schema-flexibility :write}]
