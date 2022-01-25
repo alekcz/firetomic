@@ -1,36 +1,40 @@
-# Datahike Server
+# Firetomic
 
 [![CI](https://github.com/alekcz/firetomic/actions/workflows/main.yml/badge.svg)](https://github.com/alekcz/firetomic/actions/workflows/main.yml)
 
-With Datahike Server you can run your Datahike with a REST interface. Deploy
-Datahike with the backend of your choice and run it in a container or on a VM.
-Push the button to deploy Datahike as a Container Instance on MS Azure with
-a file backend.
+## Deploy Firetomic
 
-## Build Datahike Server
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/alekcz/firetomic/tree/main&refcode=a0cfd79e40a2)
+
+We both get credits for DigitalOcean if you end using their services so be a mate. 
+
+## Build Firetomic
 
 `clj -T:build uber` builds an uberjar into the `target/`-directory.
 
-## Run Datahike Server
+## Run Firetomic
 
-Run Datahike Server in dev-mode without any authentication:
+Run Firetomic in dev-mode without any authentication:
 
-`DATAHIKE_SERVER_DEV_MODE=true java -jar datahike-server-0.1.84-standalone.jar`
+`FIRETOMIC_DEV_MODE=true java -jar datahike-server-0.1.84-standalone.jar`
 
 Adjust the command according to the version you built into the `target/`-directory.
 
-## Configuring Datahike Server
+## Configuring Firetomic
 ### File Configuration
 
-Datahike Server loads configuration from `resources/config.edn` relative to the
+Firetomic loads configuration from `resources/config.edn` relative to the
 current directory. This file has a number of options and overwrites all other
 configuration given via environment or properties. Below you can find an example
 to configure both Datahike and the server.
 ```
-{:databases [{:store {:backend :file
-                      :path "/tmp/dh-2"}
-             :schema-on-read true
-             :temporal-index false}]
+{:databases [{:store {:backend :firebase 
+                      :db "https://project-id.firebaseio.com/prod" 
+                      :root "firetomic"
+                      :env "GOOGLE_APPLICATION_CREDENTIALS"}
+              :name "users"
+              :keep-history? true
+              :schema-flexibility :write}]
  :server {:port 3000
           :join? false
           :dev-mode false
@@ -40,7 +44,7 @@ to configure both Datahike and the server.
 
 ### Configuration via Environment and Properties
 
-Datahike Server can also be configured via environment variables and java system
+Firetomic can also be configured via environment variables and java system
 properties. Please take a look at the [configuration of Datahike](https://github.com/replikativ/datahike/blob/development/doc/config.md) to get an
 overview of the number of possible configuration options regarding the database.
 To configure the server please see the options below. Like in Datahike they are
@@ -48,21 +52,21 @@ read via the [environ library by weavejester](https://github.com/weavejester/env
 Please provide the logging level without colon. Beware that a configuration file
 overwrites the values from environment and properties.
 
-properties                  | envvar                   | default
-----------------------------|--------------------------|-------------
-datahike.server.port        | DATAHIKE_SERVER_PORT     | 3000
-datahike.server.join        | DATAHIKE_SERVER_JOIN     | false
-datahike.server.loglevel    | DATAHIKE_SERVER_LOGLEVEL | :info
-datahike.server.dev.mode    | DATAHIKE_SERVER_DEV_MODE | false
-datahike.server.token       | DATAHIKE_SERVER_TOKEN    | no default
+envvar             | default
+-------------------|-------------
+FIRETOMIC_PORT     | 4000
+FIRETOMIC_JOIN     | false
+FIRETOMIC_LOGLEVEL | :warn
+FIRETOMIC_DEV_MODE | false
+FIRETOMIC_TOKEN    | no default
 
 ### Authentication
 
-You can authenticate to Datahike-Server with a token specified via configuration. Please
+You can authenticate to Firetomic with a token specified via configuration. Please
 then send the token within your request headers as `authentication: token <yourtoken>`.
 If you don't want to use authentication during development you can set dev-mode to true
 in your configuration and just omit the authentication-header. Please be aware that your
-Datahike Server might be running publicly accessible and then your data might be read
+Firetomic might be running publicly accessible and then your data might be read
 by anyone and the server might be misused if no authentication is active.
 
 ### Logging
@@ -98,7 +102,7 @@ severe to most severe:
 
 # License
 
-Copyright © 2020 Konrad Kühne, Timo Kramer
+Copyright © 2022 Konrad Kühne, Timo Kramer, Alex Oloo
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at

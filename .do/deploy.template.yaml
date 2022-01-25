@@ -1,0 +1,9 @@
+spec:
+  name: firetomic
+  services:
+  - name: firetomic
+    git:
+      branch: main
+      repo_clone_url: https://github.com/alekcz/firetomic.git
+    dockerfile_path: /Dockerfile
+

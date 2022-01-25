@@ -65,3 +65,6 @@
 
 (defn schema [{:keys [conn]}]
   (success (dd/-schema @conn)))
+
+(defn history [{:keys [conn]}]
+  (success (d/history @conn)))

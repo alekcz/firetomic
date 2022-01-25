@@ -189,7 +189,15 @@
                :summary    "Fetches current schema"
                :parameters {:header ::db-header}
                :middleware [middleware/token-auth middleware/auth]
-               :handler    h/schema}}]])
+               :handler    h/schema}}]
+               
+   ["/history"
+    {:swagger {:tags ["API"]}
+     :get     {:operationId "History"
+               :summary "Returns the full historical state of the database you may interact with."
+               :parameters {:header ::conn-header}
+               :middleware [middleware/token-auth middleware/auth]
+               :handler    h/history}}]])
 
 (defn wrap-db-connection [handler]
   (fn [request]
@@ -204,21 +212,25 @@
       (handler request))))
 
 (def route-opts
-  {:reitit.middleware/transform dev/print-request-diffs ;; pretty diffs
-   ;; :validate spec/validate ;; enable spec validation for route data
-   ;;:reitit.spec/wrap spell/closed ;; strict top-level validation
-   :exception pretty/exception
-   :data      {:coercion   reitit.coercion.spec/coercion
-               :muuntaja   m/instance
-               :middleware [swagger/swagger-feature
-                            parameters/parameters-middleware
-                            muuntaja/format-negotiate-middleware
-                            muuntaja/format-response-middleware
-                            exception/exception-middleware
-                            muuntaja/format-request-middleware
-                            coercion/coerce-response-middleware
-                            coercion/coerce-request-middleware
-                            multipart/multipart-middleware]}})
+  (->
+    {;; :validate spec/validate ;; enable spec validation for route data
+    ;;:reitit.spec/wrap spell/closed ;; strict top-level validation
+    :exception pretty/exception
+    :data      {:coercion   reitit.coercion.spec/coercion
+                :muuntaja   m/instance
+                :middleware [swagger/swagger-feature
+                              parameters/parameters-middleware
+                              muuntaja/format-negotiate-middleware
+                              muuntaja/format-response-middleware
+                              exception/exception-middleware
+                              muuntaja/format-request-middleware
+                              coercion/coerce-response-middleware
+                              coercion/coerce-request-middleware
+                              multipart/multipart-middleware]}}
+    (merge 
+      (if (-> config :server :dev-mode) 
+        {:reitit.middleware/transform dev/print-request-diffs} 
+        {}))))
 
 (def app
   (-> (ring/ring-handler

@@ -9,7 +9,7 @@
         environ/environ         {:mvn/version "1.2.0"}
         mount/mount             {:mvn/version "0.1.16"}
         metosin/spec-tools      {:mvn/version "0.10.5"}
-        alekcz/datahike-firebase {:mvn/version "0.2.0-20210707.212359-9"}}
+        alekcz/datahike-firebase {:mvn/version "0.2.0-20220125.093709-10"}}
 
  :paths ["src/clj"]
 

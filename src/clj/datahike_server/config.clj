@@ -32,14 +32,14 @@
   [config-file]
   (let [config-from-file (load-config-file config-file)
         server-config (merge
-                       {:port (int-from-env :port (int-from-env :firetomic-port 3000)) 
+                       {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
                         :join? (bool-from-env :firetomic-join? false)
-                        :loglevel (keyword (:firetomic-loglevel env :info))
+                        :loglevel (keyword (:firetomic-loglevel env :warn))
                         :dev-mode (bool-from-env :firetomic-dev-mode false)}
                        (:server config-from-file))
         token-config (if-let [token (keyword (:firetomic-token env))]
                        (merge
-                        {:token (keyword (:firetomic-token env))}
+                        {:token (keyword token)}
                         server-config)
                        server-config)
         validated-server-config (if (s/valid? ::server-config token-config)
@@ -54,7 +54,7 @@
                             :schema-flexibility (or (keyword (env :firetomic-schema-flexibility)) 
                                                     :read)}
                                                          
-        firetomic-configs (into [] (concat [firetomic-config] (:databases config-from-file)))]
+        firetomic-configs (or (:databases config-from-file) [firetomic-config])]
     {:server validated-server-config
      :databases firetomic-configs}))
 
