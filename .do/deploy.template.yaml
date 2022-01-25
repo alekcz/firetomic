@@ -18,5 +18,5 @@ spec:
       value: a-super-secure-long-and-unguessable-token
     - key: FIRETOMIC_FIREBASE_AUTH
       scope: RUN_TIME
-      value: {paste the service account token from firebase here}
+      value: paste the service account token from firebase here
     
