@@ -34,7 +34,7 @@
         server-config (merge
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
                         :join? (bool-from-env :firetomic-join? false)
-                        :loglevel (keyword (:firetomic-loglevel env :warn))
+                        :loglevel (keyword (:firetomic-loglevel env :debug))
                         :dev-mode (bool-from-env :firetomic-dev-mode false)}
                        (:server config-from-file))
         token-config (if-let [token (keyword (:firetomic-token env))]

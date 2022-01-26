@@ -2,19 +2,15 @@
   (:require
     [borkdude.gh-release-artifact :as gh]
     [clojure.tools.build.api :as b]
-    [deps-deploy.deps-deploy :as dd])
-  (:import
-    [java.nio.file Paths]
-    [com.google.cloud.tools.jib.api Jib Containerizer RegistryImage TarImage]
-    [com.google.cloud.tools.jib.api.buildplan AbsoluteUnixPath Port]))
+    [clojure.java.shell :refer [sh]]))
 
-(def lib 'io.replikativ/datahike-server)
+(def lib 'alekcz/firetomic)
 (def version (format "0.1.%s" (b/git-count-revs nil)))
 (def current-commit (gh/current-commit))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-path (format "target/firetomic-%s.jar" version))
-(def uber-file (format "firetomic-%s-standalone.jar" version))
+(def uber-file "firetomic-standalone.jar")
 (def uber-path (format "target/%s" uber-file))
 (def image (format "docker.io/alekcz/firetomic:%s" version))
 
@@ -59,59 +55,3 @@
            :uber-file uber-path
            :basis basis
            :main 'datahike-server.core}))
-
-(defn deploy
-  "Don't forget to set CLOJARS_USERNAME and CLOJARS_PASSWORD env vars."
-  [_]
-  (dd/deploy {:installer :remote :artifact jar-path
-              :pom-file (b/pom-path {:lib lib :class-dir class-dir})}))
-
-(defn release
-  [_]
-  (-> (gh/overwrite-asset {:org "replikativ"
-                           :repo (name lib)
-                           :tag version
-                           :commit current-commit
-                           :file uber-path
-                           :content-type "application/java-archive"})
-      :url
-      println))
-
-(defn install
-  [_]
-  (clean nil)
-  (jar nil)
-  (b/install {:basis (b/create-basis {})
-              :lib lib
-              :version version
-              :jar-file jar-path
-              :class-dir class-dir}))
-
-(defn deploy-image
-  [{:keys [docker-login docker-password]}]
-  (if-not (and docker-login docker-password)
-    (println "Docker credentials missing.")
-    (.containerize
-      (-> (Jib/from "gcr.io/distroless/java17-debian11")
-          (.addLayer [(Paths/get uber-path (into-array String[]))] (AbsoluteUnixPath/get "/"))
-          (.setProgramArguments [(format "/%s" uber-file)])
-          (.addExposedPort (Port/tcp 3000)))
-      (Containerizer/to
-        (-> (RegistryImage/named image)
-            (.addCredential (str docker-login) (str docker-password))))))
-  (println "Deployed new image to Docker Hub: " image))
-
-(comment
-  (def docker-login "")
-  (def docker-password "")
-
-  (b/pom-path {:lib lib :class-dir class-dir})
-  (clean nil)
-  (compile nil)
-  (jar nil)
-  (uber nil)
-  (deploy-image {:docker-login docker-login
-                 :docker-password docker-password})
-  (deploy nil)
-  (release nil)
-  (install nil))

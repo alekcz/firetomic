@@ -52,13 +52,17 @@ read via the [environ library by weavejester](https://github.com/weavejester/env
 Please provide the logging level without colon. Beware that a configuration file
 overwrites the values from environment and properties.
 
-envvar             | default
--------------------|-------------
-FIRETOMIC_PORT     | 4000
-FIRETOMIC_JOIN     | false
-FIRETOMIC_LOGLEVEL | :warn
-FIRETOMIC_DEV_MODE | false
-FIRETOMIC_TOKEN    | no default
+envvar                    | default
+--------------------------|-------------
+FIRETOMIC_PORT            | 4000
+FIRETOMIC_JOIN            | false
+FIRETOMIC_LOGLEVEL        | :warn
+FIRETOMIC_DEV_MODE        | false
+FIRETOMIC_TOKEN           | no default
+FIRETOMIC_NAME            | no default
+FIRETOMIC_FIREBASE_URL    | no default
+FIRETOMIC_FIREBASE_AUTH   | no default
+
 
 ### Authentication
 

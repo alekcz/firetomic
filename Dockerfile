@@ -1,7 +1,16 @@
-FROM gcr.io/distroless/java17-debian11
+FROM clojure:openjdk-17-slim-buster as builder
 
-COPY target/firetomic-*-standalone.jar /
 
-EXPOSE 3000
+COPY . /usr/firetomic
+WORKDIR /usr/firetomic
+RUN clj -X:install
+RUN clj -T:build uber
 
-CMD ["/firetomic-standalone.jar"]
+
+# use clean base image
+FROM openjdk:17-slim-buster
+
+COPY --from=builder /usr/firetomic/target/firetomic-standalone.jar /firetomic-standalone.jar
+COPY ./resources /resources
+
+CMD ["java","-jar","/firetomic-standalone.jar"]

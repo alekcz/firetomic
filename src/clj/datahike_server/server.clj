@@ -215,6 +215,7 @@
   (->
     {;; :validate spec/validate ;; enable spec validation for route data
     ;;:reitit.spec/wrap spell/closed ;; strict top-level validation
+    :reitit.middleware/transform dev/print-request-diffs
     :exception pretty/exception
     :data      {:coercion   reitit.coercion.spec/coercion
                 :muuntaja   m/instance
