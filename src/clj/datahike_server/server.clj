@@ -65,50 +65,7 @@
                            :opt-un [::db-tx]))
 (s/def ::params map?)
 
-(defn non-empty-string-alphanumeric
-  []
-  (sgen/such-that #(not= "" %)
-    (sgen/string-alphanumeric)))
-
-(defn url-gen
-  "Generator for generating URLs; note that it may generate 
-  http URLs on port 443 and https URLs on port 80, and only 
-  uses alphanumerics"
-  []
-  (sgen/fmap
-    (partial apply (comp str url/->URL))
-    (sgen/tuple
-      ;; protocol
-      (sgen/elements #{"http" "https"})
-      ;; username
-      (sgen/string-alphanumeric)
-      ;; password
-      (sgen/string-alphanumeric)
-      ;; host
-      (sgen/string-alphanumeric)
-      ;; port
-      (sgen/choose 1 65535)
-      ;; path
-      (sgen/fmap #(->> %
-                       (interleave (repeat "/"))
-                       (apply str))
-        (sgen/not-empty
-          (sgen/vector
-            (non-empty-string-alphanumeric))))
-      ;; query
-      (sgen/map
-        (non-empty-string-alphanumeric)
-        (non-empty-string-alphanumeric)
-        {:max-elements 2})
-      ;; anchor
-      (sgen/string-alphanumeric))))
-
-(s/def ::firebase-url (s/with-gen
-               (s/and string?
-                      #(try
-                         (url/url %)
-                         (catch Throwable t false)))
-               url-gen))
+(s/def ::firebase-url (s/and string? #(try (url/url %) (catch Throwable _ false))))
 
 (s/def ::name string?)
 (s/def ::keep-history? boolean?)
@@ -250,15 +207,7 @@
                :summary    "Fetches current schema"
                :parameters {:header ::db-header}
                :middleware [middleware/token-auth middleware/auth]
-               :handler    h/schema}}]
-               
-   ["/history"
-    {:swagger {:tags ["API"]}
-     :get     {:operationId "History"
-               :summary "Returns the full historical state of the database you may interact with."
-               :parameters {:header ::conn-header}
-               :middleware [middleware/token-auth middleware/auth]
-               :handler    h/history}}]])
+               :handler    h/schema}}]])
 
 (defn wrap-db-connection [handler]
   (fn [request]

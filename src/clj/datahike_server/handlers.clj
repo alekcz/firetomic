@@ -69,10 +69,7 @@
 
 (defn schema [{:keys [conn]}]
   (success (dd/-schema @conn)))
-
-(defn history [{conn :conn db :db}]
-  (success (d/history (or db @conn))))
-
+  
 (defn create-database [{{:keys [body]} :parameters}]
   (try
     (db/add-database body)

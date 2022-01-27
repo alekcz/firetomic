@@ -1,5 +1,5 @@
 {:databases [{:store {:backend :firebase 
-                      :db "http://localhost:9000" 
+                      :db "http://localhost:9000/dev" 
                       :root "sessions"}
               :initial-tx [{:name "Alice", :age 20}
                            {:name "Bob", :age 21}]
@@ -7,7 +7,7 @@
               :keep-history? false
               :name "sessions"}
              {:store {:backend :firebase 
-                      :db "http://localhost:9000" 
+                      :db "http://localhost:9000/dev" 
                       :root "users"}
               :name "users"
               :keep-history? true

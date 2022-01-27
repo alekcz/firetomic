@@ -14,7 +14,7 @@
     (edn/read-string body)
     ""))
 
-(def test-root "http://localhost:9000")
+(def test-root "http://localhost:9000/prod")
 
 (defn api-request
   ([method url]

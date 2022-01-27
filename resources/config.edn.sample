@@ -1,17 +1,18 @@
-{:databases [{:store {:backend :mem
-                      :id "sessions"}
+{:databases [{:store {:backend :firebase 
+                      :db "https://project-id.firebaseio.com/prod" 
+                      :root "sessions"}
+              :initial-tx [{:name "Alice", :age 20}
+                           {:name "Bob", :age 21}]
               :schema-flexibility :read
               :keep-history? false
               :name "sessions"}
              {:store {:backend :firebase 
                       :db "https://project-id.firebaseio.com/prod" 
-                      :root "firetomic"
-                      :env "GOOGLE_APPLICATION_CREDENTIALS"}
+                      :root "users"}
               :name "users"
               :keep-history? true
               :schema-flexibility :write}]
  :server {:port  3333
           :join? false
-          :loglevel :info
-          :dev-mode false
-          :token :securerandompassword}}
+          :loglevel :debug
+          :token :neverusethisaspassword}}
