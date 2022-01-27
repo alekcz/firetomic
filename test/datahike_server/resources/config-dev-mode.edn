@@ -1,13 +1,14 @@
-{:databases [{:store {:backend :mem
-                      :id "sessions"}
+{:databases [{:store {:backend :firebase 
+                      :db "http://localhost:9000" 
+                      :root "sessions"}
               :initial-tx [{:name "Alice", :age 20}
                            {:name "Bob", :age 21}]
               :schema-flexibility :read
               :keep-history? false
               :name "sessions"}
              {:store {:backend :firebase 
-                      :db "http://localhost:9000/firetomic-test" 
-                      :root "firetomic"}
+                      :db "http://localhost:9000" 
+                      :root "users"}
               :name "users"
               :keep-history? true
               :schema-flexibility :write}]

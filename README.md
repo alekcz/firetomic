@@ -14,9 +14,9 @@ We both get credits for DigitalOcean if you end using their services so be a mat
 
 ## Run Firetomic
 
-Run Firetomic in dev-mode without any authentication:
+Run firetomic in locally:
 
-`FIRETOMIC_DEV_MODE=true java -jar datahike-server-0.1.84-standalone.jar`
+`clj -X:run`
 
 Adjust the command according to the version you built into the `target/`-directory.
 
@@ -29,9 +29,9 @@ configuration given via environment or properties. Below you can find an example
 to configure both Datahike and the server.
 ```
 {:databases [{:store {:backend :firebase 
-                      :db "https://project-id.firebaseio.com/prod" 
-                      :root "firetomic"
-                      :env "GOOGLE_APPLICATION_CREDENTIALS"}
+                      :db "https://project-id.firebaseio.com" 
+                      :root "users"
+                      :env "FIRETOMIC_FIREBASE_AUTH"}
               :name "users"
               :keep-history? true
               :schema-flexibility :write}]
@@ -58,10 +58,10 @@ FIRETOMIC_PORT            | 4000
 FIRETOMIC_JOIN            | false
 FIRETOMIC_LOGLEVEL        | :warn
 FIRETOMIC_DEV_MODE        | false
-FIRETOMIC_TOKEN           | no default
-FIRETOMIC_NAME            | no default
-FIRETOMIC_FIREBASE_URL    | no default
-FIRETOMIC_FIREBASE_AUTH   | no default
+FIRETOMIC_TOKEN           | --
+FIRETOMIC_NAME            | --
+FIRETOMIC_FIREBASE_URL    | http://localhost:9000
+FIRETOMIC_FIREBASE_AUTH   | --
 
 
 ### Authentication

@@ -46,10 +46,10 @@
                                   token-config
                                   (throw (ex-info "Server configuration error:" (s/explain-data ::server-config token-config))))
         firetomic-config  {:store { :backend :firebase 
-                                    :db (env :firetomic-firebase-url)
+                                    :db (str (or (env :firetomic-firebase-url) "http://localhost:9000") "/firetomic")
                                     :root (env :firetomic-name)
                                     :env "FIRETOMIC_FIREBASE_AUTH"}
-                            :name (env :firetomic-name env)
+                            :name (env :firetomic-name)
                             :keep-history? (bool-from-env :firetomic-keep-history false) 
                             :schema-flexibility (or (keyword (env :firetomic-schema-flexibility)) 
                                                     :read)}

@@ -1,26 +1,29 @@
 (ns datahike-server.database
-  (:require [mount.core :refer [defstate stop start]]
+  (:require [mount.core :refer [defstate stop start] :as mount]
             [taoensso.timbre :as log]
             [datahike-server.config :refer [config]]
             [datahike-firebase.core]
-            [datahike.api :as d])
+            [datahike.api :as d]
+            [fire.core :as fire]
+            [fire.auth :as auth])
   (:import [java.util UUID]))
 
+(defn scan-stores [{:keys [databases]}]
+  (let [dbs (into [] (set (map #(-> % :store :db) databases)))
+        auth (auth/create-token "FIRETOMIC_FIREBASE_AUTH")
+        new (for [d dbs]
+              (let [names (keys (fire/read d "/" auth {:query {:shallow true}}))]
+                (for [n names]
+                  (let [store {:store {:backend :firebase :db d :root (name n) :env "FIRETOMIC_FIREBASE_AUTH"}}]
+                    (when (d/database-exists? store)
+                      (let [c (.-config @(d/connect store))]
+                        (assoc-in c [:store :env] "FIRETOMIC_FIREBASE_AUTH")))))))]                        
+    (filter some? (flatten new))))
+
 (defn init-connections [{:keys [databases]}]
-  (if (nil? databases)
-    (let [_ (when-not (d/database-exists?)
-              (log/infof "Creating database...")
-              (d/create-database)
-              (log/infof "Done"))
-          conn (d/connect)]
-      {(-> @conn :config :name) conn})
+  (when-not (nil? databases)
     (reduce
      (fn [acc {:keys [name] :as cfg}]
-       (when (contains? acc name)
-         (throw (ex-info
-                 (str "A database with name '" name "' already exists. Database names on the transactor should be unique.")
-                 {:event :connection/initialization
-                  :error :database.name/duplicate})))
        (when-not (d/database-exists? cfg)
          (log/infof "Creating database...")
          (d/create-database cfg)
@@ -31,18 +34,32 @@
      databases)))
 
 (defstate conns
-  :start (do
-           (log/debug "Connecting to databases with config: " (str config))
-           (init-connections config))
+  :start (let [existing (scan-stores config)
+               final-dbs (into [] (set (concat existing (:databases config))))
+               final-config (assoc config :databases final-dbs)]
+           (log/debug "Connecting to databases with config: " (str final-config))
+           (init-connections final-config))
   :stop (for [conn (vals conns)]
           (d/release conn)))
 
-(defn cleanup-databases []
-  (stop #'datahike-server.database/conns)
-  (doall
-   (for [cfg (:databases config)]
-     (do
-       (println "Purging " cfg " ...")
-       (d/delete-database cfg)
-       (println "Done"))))
-  (start #'datahike-server.database/conns))
+(defn add-database [{:keys [firebase-url name keep-history? schema-flexibility]}]
+  (let [cfg { :store {:backend :firebase 
+                      :db firebase-url
+                      :root name
+                      :env "FIRETOMIC_FIREBASE_AUTH"}
+              :name name
+              :keep-history? keep-history?
+              :schema-flexibility schema-flexibility}]
+    (when (contains? conns name)
+         (throw (ex-info
+                 (str "A database with name '" name "' already exists. Database names on the transactor should be unique.")
+                 {:event :connection/initialization
+                  :error :database.name/duplicate})))
+    (when-not (d/database-exists? cfg)
+      (log/infof "Creating database...")
+      (d/create-database cfg)  
+      (log/infof "Done"))
+    (let [new-conns (assoc conns name (d/connect cfg))]
+      (-> 
+      (mount/swap {#'datahike-server.database/conns new-conns})
+      (mount/start)))))

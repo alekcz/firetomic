@@ -1,13 +1,20 @@
 (ns ^:integration datahike-server.integration-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is testing use-fixtures]]
             [clojure.edn :as edn]
+            [datahike-server.install :as is]
+            [datahike-server.database :as db]
             [clj-http.client :as client]
             [datahike-server.core :refer [start-all stop-all]]))
+
+(defn no-env [xs]
+  (for [x xs] (update-in x [:store] dissoc :env)))
 
 (defn parse-body [{:keys [body]}]
   (if-not (empty? body)
     (edn/read-string body)
     ""))
+
+(def test-root "http://localhost:9000")
 
 (defn api-request
   ([method url]
@@ -31,6 +38,10 @@
 
 (use-fixtures :once setup-db)
 
+(deftest install-test
+  (testing "that deps will be forced to download in docker"
+    (is (= "dependencies downloaded" (with-out-str (is/install nil))))))
+
 (deftest swagger-test
   (testing "Swagger Json"
     (is (= {:title "Datahike API"
@@ -40,32 +51,55 @@
                                nil
                                {:headers {:authorization "token neverusethisaspassword"}}))))))
 
-(deftest databases-test
-  (testing "Get Databases"
-    (is (= {:databases
-            [{:store {:id "sessions", :backend :mem},
-              :initial-tx [{:name "Alice", :age 20}
-                           {:name "Bob", :age 21}]
-              :keep-history? false,
-              :schema-flexibility :read,
-              :name "sessions",
-              :index :datahike.index/hitchhiker-tree
-              :attribute-refs? false,
-              :cache-size 100000,
-              :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}
-             {:store {:backend :firebase 
-                      :db "http://localhost:9000/firetomic-test" 
-                      :root "firetomic"},
-              :keep-history? true,
-              :schema-flexibility :write,
-              :name "users",
-              :index :datahike.index/hitchhiker-tree
-              :attribute-refs? false,
-              :cache-size 100000,
-              :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}]}
-           (api-request :get "/databases"
-                        nil
-                        {:headers {:authorization "token neverusethisaspassword"}})))))
+(deftest create-test
+  (testing "Get and create a databases"
+    (let [a1  [{:store {:backend :firebase 
+                        :db test-root
+                        :root "sessions"},
+                :initial-tx [{:name "Alice", :age 20}
+                            {:name "Bob", :age 21}]
+                :keep-history? false,
+                :schema-flexibility :read,
+                :name "sessions",
+                :index :datahike.index/hitchhiker-tree
+                :attribute-refs? false,
+                :cache-size 100000,
+                :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}
+              {:store {:backend :firebase 
+                        :db test-root 
+                        :root "users"},
+                :keep-history? true,
+                :schema-flexibility :write,
+                :name "users",
+                :index :datahike.index/hitchhiker-tree
+                :attribute-refs? false,
+                :cache-size 100000,
+                :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}]
+            a2 (:databases (api-request :get "/databases"
+                              nil
+                              {:headers {:authorization "token neverusethisaspassword"}}))
+            a3 (:databases (api-request :post "/create-database"
+                              {:firebase-url test-root
+                              :name "testing",
+                              :keep-history? true
+                              :schema-flexibility :read}
+                              {:headers {:authorization "token neverusethisaspassword"}}))
+            a4 (api-request :post "/create-database"
+                              {:firebase-url test-root
+                              :name "testing"
+                              :keep-history? true
+                              :schema-flexibility :read}
+                              {:headers {:authorization "token neverusethisaspassword"}})
+            a5 (no-env (db/scan-stores {:databases [{:store {:db test-root}}]}))]
+                          
+      (is (= (sort-by :name a1) (sort-by :name a2)))
+      (is (not= (sort-by :name a2) (sort-by :name a3)))
+      (is (= (sort-by :name a3) (sort-by :name (:databases a4))))
+      (is (= (sort-by :name a3) (sort-by :name a5)))
+      (is (= (count a1) (count a2)))
+      (is (= (count a3) (count (:databases a4))))
+      (is (< (count a2) (count a3)))
+      (is (true? (:error a4))))))
 
 (deftest transact-test
   (testing "Transact values"

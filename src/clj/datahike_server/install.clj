@@ -2,4 +2,4 @@
   (:gen-class))
 
 (defn install [_]
-  (println "dependencies downloaded"))
+  (print "dependencies downloaded"))

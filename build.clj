@@ -5,8 +5,7 @@
     [clojure.java.shell :refer [sh]]))
 
 (def lib 'alekcz/firetomic)
-(def version (format "0.1.%s" (b/git-count-revs nil)))
-(def current-commit (gh/current-commit))
+(def version (slurp "resources/VERSION"))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-path (format "target/firetomic-%s.jar" version))

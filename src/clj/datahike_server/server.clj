@@ -19,6 +19,8 @@
             [ring.middleware.cors :refer [wrap-cors]]
             [muuntaja.core :as m]
             [clojure.spec.alpha :as s]
+            [cemerick.url :as url]
+            [clojure.spec.gen.alpha :as sgen]
             [taoensso.timbre :as log]
             [mount.core :refer [defstate]]
             [ring.adapter.jetty :refer [run-jetty]]
@@ -63,6 +65,57 @@
                            :opt-un [::db-tx]))
 (s/def ::params map?)
 
+(defn non-empty-string-alphanumeric
+  []
+  (sgen/such-that #(not= "" %)
+    (sgen/string-alphanumeric)))
+
+(defn url-gen
+  "Generator for generating URLs; note that it may generate 
+  http URLs on port 443 and https URLs on port 80, and only 
+  uses alphanumerics"
+  []
+  (sgen/fmap
+    (partial apply (comp str url/->URL))
+    (sgen/tuple
+      ;; protocol
+      (sgen/elements #{"http" "https"})
+      ;; username
+      (sgen/string-alphanumeric)
+      ;; password
+      (sgen/string-alphanumeric)
+      ;; host
+      (sgen/string-alphanumeric)
+      ;; port
+      (sgen/choose 1 65535)
+      ;; path
+      (sgen/fmap #(->> %
+                       (interleave (repeat "/"))
+                       (apply str))
+        (sgen/not-empty
+          (sgen/vector
+            (non-empty-string-alphanumeric))))
+      ;; query
+      (sgen/map
+        (non-empty-string-alphanumeric)
+        (non-empty-string-alphanumeric)
+        {:max-elements 2})
+      ;; anchor
+      (sgen/string-alphanumeric))))
+
+(s/def ::firebase-url (s/with-gen
+               (s/and string?
+                      #(try
+                         (url/url %)
+                         (catch Throwable t false)))
+               url-gen))
+
+(s/def ::name string?)
+(s/def ::keep-history? boolean?)
+(s/def ::schema-flexibility keyword?)
+
+(s/def ::database (s/keys :req-un [::firebase-url ::name ::keep-history? ::schema-flexibility]))
+
 (def routes
   [["/swagger.json"
     {:get {:no-doc  true
@@ -96,6 +149,14 @@
            :handler (fn [request]
                       (pprint request)
                       {:status 200})}}]
+   ["/create-database"
+    {:swagger {:tags ["API"]}
+     :post    {:operationId "CreateDatabase"
+               :summary "Create a new firetomic database"
+               :parameters {:body   (st/spec {:spec ::database
+                                              :name "database"})}
+               :middleware [middleware/token-auth middleware/auth]
+               :handler    h/create-database}}]
 
    ["/transact"
     {:swagger {:tags ["API"]}
@@ -215,7 +276,7 @@
   (->
     {;; :validate spec/validate ;; enable spec validation for route data
     ;;:reitit.spec/wrap spell/closed ;; strict top-level validation
-    :reitit.middleware/transform dev/print-request-diffs
+    ;; :reitit.middleware/transform dev/print-request-diffs
     :exception pretty/exception
     :data      {:coercion   reitit.coercion.spec/coercion
                 :muuntaja   m/instance

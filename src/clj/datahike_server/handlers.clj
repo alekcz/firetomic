@@ -1,5 +1,5 @@
 (ns datahike-server.handlers
-  (:require [datahike-server.database :refer [conns]]
+  (:require [datahike-server.database :refer [conns] :as db]
             [datahike.api :as d]
             [datahike.db :as dd]
             [datahike-firebase.core]
@@ -9,12 +9,16 @@
   ([data] {:status 200 :body data})
   ([] {:status 200}))
 
-(defn list-databases [_]
+(defn list-databases-helper []
   (let [xf (comp
             (map deref)
             (map :config))
-        databases (into [] xf (-> conns vals))]
-    (success {:databases databases})))
+        databases' (into [] xf (-> conns vals))
+        databases (for [d databases'] (update-in d [:store] dissoc :env))]
+    {:databases databases}))
+
+(defn list-databases [_]
+  (success (list-databases-helper)))
 
 (defn get-db [{:keys [conn]}]
   (success {:tx (dd/-max-tx @conn)}))
@@ -66,5 +70,14 @@
 (defn schema [{:keys [conn]}]
   (success (dd/-schema @conn)))
 
-(defn history [{:keys [conn]}]
-  (success (d/history @conn)))
+(defn history [{conn :conn db :db}]
+  (success (d/history (or db @conn))))
+
+(defn create-database [{{:keys [body]} :parameters}]
+  (try
+    (db/add-database body)
+    (success (list-databases-helper)) 
+    (catch Exception e
+      (success (merge (list-databases-helper)
+                      {:error true
+                       :message (.getMessage e)})))))
