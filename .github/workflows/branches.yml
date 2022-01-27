@@ -1,12 +1,16 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Branches
 
 on:
   push:
     branches: 
-       - 'main'
-       
+       - '*'
+       - '!main'
+  pull_request:
+    branches: 
+       - '*'
+
   workflow_dispatch:
 
 jobs:
@@ -51,8 +55,6 @@ jobs:
           bash unit.sh
           
       - name: Run integration tests
-        env: 
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           mkdir -p ~/.npm-global
           npm config set prefix '~/.npm-global'
