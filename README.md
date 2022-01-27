@@ -1,10 +1,10 @@
 # Firetomic
 
-[![CI](https://github.com/alekcz/firetomic/actions/workflows/main.yml/badge.svg)](https://github.com/alekcz/firetomic/actions/workflows/main.yml)
+[![CI](https://github.com/alekcz/firetomic/actions/workflows/main.yml/badge.svg)](https://github.com/alekcz/firetomic/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/alekcz/firetomic/branch/main/graph/badge.svg?token=UkLQlpnfbp)](https://codecov.io/gh/alekcz/firetomic)   
 
 ## Deploy Firetomic
 
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/alekcz/firetomic/tree/main&refcode=a0cfd79e40a2) [![codecov](https://codecov.io/gh/alekcz/firetomic/branch/main/graph/badge.svg?token=UkLQlpnfbp)](https://codecov.io/gh/alekcz/firetomic)
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/alekcz/firetomic/tree/main&refcode=a0cfd79e40a2)  
 
 
 We both get credits for DigitalOcean if you end using their services so be a mate. 
