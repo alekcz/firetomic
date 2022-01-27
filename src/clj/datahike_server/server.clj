@@ -86,26 +86,7 @@
                :summary "List available databases."
                :middleware [middleware/token-auth middleware/auth]
                :handler h/list-databases}}]
-
-   ["/echo"
-    {:get  {:operationId "EchoGET"
-            :summary "For testing purposes only."
-            :handler (fn [request]
-                       (pprint request)
-                       {:status 200})}
-     :post {:operationId "EchoPOST"
-            :parameters {:body (st/spec {:spec ::params
-                                         :name "arbitrary-params"})}
-            :handler    (fn [request]
-                          ;(pprint request)
-                          {:status 200 :body (:parameters request)})}}]
-
-   ["/echo/:id"
-    {:get {:operationId "EchoId"
-           :summary "For testing purposes only."
-           :handler (fn [request]
-                      (pprint request)
-                      {:status 200})}}]
+               
    ["/create-database"
     {:swagger {:tags ["API"]}
      :post    {:operationId "CreateDatabase"

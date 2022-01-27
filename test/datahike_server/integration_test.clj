@@ -3,8 +3,9 @@
             [clojure.edn :as edn]
             [datahike-server.install :as is]
             [datahike-server.database :as db]
+            [datahike-server.config :as dc]
             [clj-http.client :as client]
-            [datahike-server.core :refer [start-all stop-all]]))
+            [datahike-server.core :refer [start-all stop-all -main]]))
 
 (defn no-env [xs]
   (for [x xs] (update-in x [:store] dissoc :env)))
@@ -34,6 +35,8 @@
 (defn setup-db [f]
   (start-all)
   (f)
+  (stop-all)
+  (-main nil)
   (stop-all))
 
 (use-fixtures :once setup-db)
@@ -194,3 +197,27 @@
                         {}
                         {:headers {:authorization "token neverusethisaspassword"
                                    :db-name "sessions"}})))))
+
+(deftest load-config-file-test
+  (testing "Loading a file from disk"
+    (is (= nil (dc/load-config-file "foo")))
+    (is (= nil (dc/load-config-file "test/datahike_server/resources/config.edn.broken")))
+    (is (= {:databases [{:store { :backend :firebase 
+                                  :db "http://localhost:9000/prod" 
+                                  :root "sessions"}
+                          :initial-tx [{:name "Alice", :age 20}
+                                      {:name "Bob", :age 21}]
+                          :schema-flexibility :read
+                          :keep-history? false
+                          :name "sessions"}
+                        {:store { :backend :firebase 
+                                  :db "http://localhost:9000/prod" 
+                                  :root "users"}
+                          :name "users"
+                          :keep-history? true
+                          :schema-flexibility :write}]
+            :server {:port  3333
+                     :join? false
+                     :loglevel :debug
+                     :token :neverusethisaspassword}}
+           (dc/load-config-file "test/datahike_server/resources/config.edn")))))

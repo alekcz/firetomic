@@ -58,27 +58,3 @@
                            :port 2,
                            :path "/testdb"}]}
              (load-config "foobar"))))))
-
-(deftest load-config-file-test
-  (testing "Loading a file from disk"
-    (is (= nil (load-config-file "foo")))
-    (is (= nil (load-config-file "test/datahike_server/resources/config.edn.broken")))
-    (is (= {:databases [{:store { :backend :firebase 
-                                  :db "http://localhost:9000/prod" 
-                                  :root "sessions"}
-                          :initial-tx [{:name "Alice", :age 20}
-                                      {:name "Bob", :age 21}]
-                          :schema-flexibility :read
-                          :keep-history? false
-                          :name "sessions"}
-                        {:store { :backend :firebase 
-                                  :db "http://localhost:9000/prod" 
-                                  :root "users"}
-                          :name "users"
-                          :keep-history? true
-                          :schema-flexibility :write}]
-            :server {:port  3333
-                     :join? false
-                     :loglevel :debug
-                     :token :neverusethisaspassword}}
-           (load-config-file "test/datahike_server/resources/config.edn")))))

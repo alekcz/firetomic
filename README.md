@@ -19,8 +19,6 @@ Run firetomic in locally:
 
 `clj -X:run`
 
-Adjust the command according to the version you built into the `target/`-directory.
-
 ## Configuring Firetomic
 ### File Configuration
 
@@ -107,7 +105,7 @@ severe to most severe:
 
 # License
 
-Copyright © 2022 Konrad Kühne, Timo Kramer, Alex Oloo
+Copyright © 2022 Konrad Kühne, Timo Kramer, Alexander Oloo
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
