@@ -1,4 +1,5 @@
-#kaocha/v1 {:tests [{:id :unit
+#kaocha/v1 {:cloverage/opts {:codecov? true}
+            :tests [{:id :unit
                      :skip-meta [:integration]}
                     {:id :integration
                      :focus-meta [:integration]}]
