@@ -8,8 +8,11 @@
 
 [![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/alekcz/firetomic/tree/main&refcode=a0cfd79e40a2)  
 
+We both get credits for DigitalOcean if you end using their services so be a mate.   
 
-We both get credits for DigitalOcean if you end using their services so be a mate. 
+Or you could deploy to Heroku  
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/alekcz/firetomic/tree/main)
 
 ## Build Firetomic
 
