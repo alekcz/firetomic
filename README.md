@@ -39,7 +39,7 @@ docker run \
 ```
 
 The command above will read your firebase service account credentials from the `FIRETOMIC_FIREBASE_AUTH` environment variable.
-You can also se
+If you prefer you could set the environment variables on you machine. If you leaving out the `=` and value iin the above command hey will be pulled from your environment and passed to the docker images as is the case with  `FIRETOMIC_FIREBASE_AUTH`.
 
 If you prefer not to connect to firebase at this point you can use the firebase CLI and run the emulator. 
 ```
@@ -47,8 +47,7 @@ npm install -g firebase-tools@10.1.2
 firebase emulators:start --only database
 ```
 
-The emulator runs on http://localhost:9000 and doesn't require authentication. All data is discarded when the emulator is shut down.   
-You can learn more about the firebase emulator at [https://firebase.google.com/docs/emulator-suite](https://firebase.google.com/docs/emulator-suite)
+The emulator runs on http://localhost:9000 and doesn't require authentication. All data is discarded when the emulator is shut down. You can learn more about the firebase emulator at [https://firebase.google.com/docs/emulator-suite](https://firebase.google.com/docs/emulator-suite)
 
 ## Configuring Firetomic
 ### File Configuration
