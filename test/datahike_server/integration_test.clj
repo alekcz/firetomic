@@ -54,6 +54,10 @@
                                nil
                                {:headers {:authorization "token neverusethisaspassword"}}))))))
 
+(deftest ping-test
+  (testing "Ping"
+    (is (= "pew pew" (:body (client/request {:url "http://localhost:3333/ping" :method :get}))))))
+
 (deftest create-test
   (testing "Get and create a databases"
     (let [a1  [{:store {:backend :mem

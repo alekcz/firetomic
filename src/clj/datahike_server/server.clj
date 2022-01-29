@@ -72,7 +72,11 @@
 (s/def ::database (s/keys :req-un [::firebase-url ::name ::keep-history? ::schema-flexibility]))
 
 (def routes
-  [["/swagger.json"
+  [["/ping"
+    {:get {:no-doc  true
+           :handler (constantly {:status 200 :body "pew pew" :headers {"Content-Type" "text/plain"}})}}]
+
+    ["/swagger.json"
     {:get {:no-doc  true
            :swagger {:info {:title       "Datahike API"
                             :description "Transaction and search functions"}}

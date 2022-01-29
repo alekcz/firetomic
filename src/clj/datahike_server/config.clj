@@ -40,7 +40,7 @@
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
                         :loglevel (keyword (:firetomic-loglevel env :debug))
                         :token token
-                        :dev-mode (bool-from-env :firetomic-dev-mode (nil? token))}
+                        :dev-mode (bool-from-env :firetomic-dev-mode false)}
                        (:server config-from-file))
         validated-server-config (if (s/valid? ::server-config server-config)
                                   server-config
