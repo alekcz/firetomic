@@ -117,7 +117,7 @@ severe to most severe:
 
 # Roadmap
 
-## Release 0.1.0
+## Release 0.2.0
 - [ ] JSON support #18
 - [x] Token authentication
 - [ ] Implement db-tx #25
@@ -126,7 +126,7 @@ severe to most severe:
 - [ ] [Clojure client](https://github.com/replikativ/datahike-client/)
 - [ ] [Clojurescript client](https://github.com/replikativ/datahike-client/)
 
-## Release 0.2.0
+## Release 0.3.0
 - [ ] Import/Export/Backup
 - [ ] Metrics
 - [ ] Subscribe to transactions
