@@ -20,17 +20,35 @@ Or you could deploy to Heroku
 
 ## Run Firetomic
 
-Run firetomic in locally:
+Run firetomic in locally from the source:
 
 `clj -X:run`
 
 Or you could run the docker image like so:
 
+```bash 
+docker run \
+  --env FIRETOMIC_NAME=mydb \
+  --env FIRETOMIC_FIREBASE_URL=https://project-id.firebaseio.com \
+  --env FIRETOMIC_FIREBASE_AUTH \
+  --env FIRETOMIC_PORT=4000 \
+  --env FIRETOMIC_TOKEN=foshizzle \
+  --env FIRETOMIC_DEV_MODE=true \
+  -p 4000:4000 \
+  alekcz/firetomic:latest 
+```
 
-Or build and run your own if you're fancy:
+The command above will read your firebase service account credentials from the `FIRETOMIC_FIREBASE_AUTH` environment variable.
+You can also se
 
-`bash docker-build.sh`  
-`bash docker-run.sh`  
+If you prefer not to connect to firebase at this point you can use the firebase CLI and run the emulator. 
+```
+npm install -g firebase-tools@10.1.2
+firebase emulators:start --only database
+```
+
+The emulator runs on http://localhost:9000 and doesn't require authentication. All data is discarded when the emulator is shut down.   
+You can learn more about the firebase emulator at [https://firebase.google.com/docs/emulator-suite](https://firebase.google.com/docs/emulator-suite)
 
 ## Configuring Firetomic
 ### File Configuration
