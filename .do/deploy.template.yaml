@@ -13,6 +13,9 @@ spec:
     - key: FIRETOMIC_NAME
       scope: RUN_TIME
       value: firetomic-1
+    - key: FIRETOMIC_DEV_MODE
+      scope: RUN_TIME
+      value: make-this-true-for-testing
     - key: FIRETOMIC_TOKEN
       scope: RUN_TIME
       value: a-super-secure-long-and-unguessable-token
