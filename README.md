@@ -24,6 +24,14 @@ Run firetomic in locally:
 
 `clj -X:run`
 
+Or you could run the docker image like so:
+
+
+Or build and run your own if you're fancy:
+
+`bash docker-build.sh`  
+`bash docker-run.sh`  
+
 ## Configuring Firetomic
 ### File Configuration
 
@@ -48,8 +56,8 @@ to configure both Datahike and the server.
 
 ### Configuration via Environment and Properties
 
-Firetomic can also be configured via environment variables and java system
-properties. Please take a look at the [configuration of Datahike](https://github.com/replikativ/datahike/blob/development/doc/config.md) to get an
+Firetomic can also be configured via environment variables. 
+Please take a look at the [configuration of Datahike](https://github.com/replikativ/datahike/blob/development/doc/config.md) to get an
 overview of the number of possible configuration options regarding the database.
 To configure the server please see the options below. Like in Datahike they are
 read via the [environ library by weavejester](https://github.com/weavejester/environ).
@@ -59,8 +67,7 @@ overwrites the values from environment and properties.
 envvar                    | default
 --------------------------|-------------
 FIRETOMIC_PORT            | 4000
-FIRETOMIC_JOIN            | false
-FIRETOMIC_LOGLEVEL        | :warn
+FIRETOMIC_LOGLEVEL        | warn
 FIRETOMIC_DEV_MODE        | false
 FIRETOMIC_TOKEN           | --
 FIRETOMIC_NAME            | --
