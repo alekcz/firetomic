@@ -1,6 +1,6 @@
 {
   "name": "Firetomic",
-  "description": "A datalog database using Datahike and Firebase",
+  "description": "A datalog database server using Datahike and Firebase",
   "repository": "https://github.com/alekcz/firetomic",
   "logo": "https://raw.githubusercontent.com/alekcz/firetomic/main/resources/logo.svg",
   "keywords": ["firetomic","firebase", "clojure"],
