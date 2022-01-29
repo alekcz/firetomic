@@ -12,11 +12,14 @@
   :args (s/cat :config-file string?)
   :ret map?)
 (s/def ::port int?)
-(s/def ::join? boolean?)
 (s/def ::loglevel #{:trace :debug :info :warn :error :fatal :report})
-(s/def ::token keyword?)
+
+(s/def ::set-token keyword?)
+(s/def ::nil-token nil?)
+(s/def ::token (s/or :s keyword? :n nil?))
+
 (s/def ::dev-mode boolean?)
-(s/def ::server-config (s/keys :req-un [::port ::join? ::loglevel]
+(s/def ::server-config (s/keys :req-un [::port ::loglevel]
                                :opt-un [::dev-mode ::token]))
 
 (defn load-config-file [config-file]
@@ -31,20 +34,17 @@
    Argument: relative path of config file as string"
   [config-file]
   (let [config-from-file (load-config-file config-file)
+        token (keyword (:firetomic-token env nil))
+        _ (println token)
         server-config (merge
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
-                        :join? (bool-from-env :firetomic-join? false)
                         :loglevel (keyword (:firetomic-loglevel env :debug))
-                        :dev-mode (bool-from-env :firetomic-dev-mode false)}
+                        :token token
+                        :dev-mode (bool-from-env :firetomic-dev-mode (nil? token))}
                        (:server config-from-file))
-        token-config (if-let [token (keyword (:firetomic-token env))]
-                       (merge
-                        {:token (keyword token)}
-                        server-config)
-                       server-config)
-        validated-server-config (if (s/valid? ::server-config token-config)
-                                  token-config
-                                  (throw (ex-info "Server configuration error:" (s/explain-data ::server-config token-config))))
+        validated-server-config (if (s/valid? ::server-config server-config)
+                                  server-config
+                                  (throw (ex-info "Server configuration error:" (s/explain-data ::server-config server-config))))
         firetomic-config  {:store { :backend :firebase 
                                     :db (or (env :firetomic-firebase-url) "http://localhost:9000")
                                     :root (env :firetomic-name)

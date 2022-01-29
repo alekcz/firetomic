@@ -56,7 +56,16 @@
 
 (deftest create-test
   (testing "Get and create a databases"
-    (let [a1  [{:store {:backend :firebase 
+    (let [a1  [{:store {:backend :mem
+                        :id "default"}
+                :schema-flexibility :read
+                :keep-history? false
+                :name "default"
+                :index :datahike.index/hitchhiker-tree
+                :attribute-refs? false,
+                :cache-size 100000,
+                :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}
+              {:store {:backend :firebase 
                         :db test-root
                         :root "sessions"},
                 :initial-tx [{:name "Alice", :age 20}
@@ -93,7 +102,7 @@
                               :keep-history? true
                               :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}})
-            a5 (no-env (db/scan-stores {:databases [{:store {:db test-root}}]}))
+            a5 (no-env (conj (db/scan-stores {:databases [{:store {:db test-root}}]}) db/memdb))
             a6 (api-request :post "/transact"
                         {:tx-data [{:foo 1}]}
                         {:headers {:authorization "token neverusethisaspassword"

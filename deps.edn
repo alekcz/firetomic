@@ -9,7 +9,7 @@
           io.replikativ/datahike    {:mvn/version "0.4.1479"}
           alekcz/datahike-firebase  {:mvn/version "0.2.0-20220125.093709-10"}
           buddy/buddy-auth          {:mvn/version "3.0.1"}
-          ring/ring-core            {:mvn/version "1.9.4"}
+          ring/ring                 {:mvn/version "1.9.4"}
           http-kit/http-kit         {:mvn/version "2.6.0-alpha1"}
           metosin/reitit            {:mvn/version "0.5.15"}
           ring-cors/ring-cors       {:mvn/version "0.1.13"}

@@ -20,11 +20,8 @@
             [muuntaja.core :as m]
             [clojure.spec.alpha :as s]
             [cemerick.url :as url]
-            [clojure.spec.gen.alpha :as sgen]
             [taoensso.timbre :as log]
             [mount.core :refer [defstate]]
-            [ring.adapter.jetty :refer [run-jetty]]
-            [clojure.pprint :refer [pprint]]
             [spec-tools.core :as st]
             [org.httpkit.server :refer [run-server server-stop!]]))
 

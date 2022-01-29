@@ -1,5 +1,5 @@
 (ns datahike-server.middleware-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is testing]]
             [datahike-server.middleware :as sut]))
 
 (deftest token-auth-test

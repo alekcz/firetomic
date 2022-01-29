@@ -45,16 +45,7 @@ jobs:
           restore-keys: |
                 ${{ runner.os }}-firebase-
       
-      - name: Run unit tests
-        run: |
-          mkdir -p ~/.npm-global
-          npm config set prefix '~/.npm-global'
-          export PATH=~/.npm-global/bin:$PATH
-          source ~/.profile
-          npm install -g firebase-tools@10.1.2
-          bash unit.sh
-          
-      - name: Run integration tests
+      - name: Run tests
         run: |
           mkdir -p ~/.npm-global
           npm config set prefix '~/.npm-global'

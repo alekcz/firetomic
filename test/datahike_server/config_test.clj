@@ -1,6 +1,6 @@
 (ns datahike-server.config-test
-  (:require [clojure.test :refer :all]
-            [datahike-server.config :refer :all]))
+  (:require [clojure.test :refer [deftest is testing]]
+            [datahike-server.config :refer [load-config load-config-file]]))
 
 (deftest bad-config-test
   (testing "Loading bad config file"

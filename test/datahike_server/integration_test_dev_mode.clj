@@ -1,7 +1,8 @@
 (ns ^:integration datahike-server.integration-test-dev-mode
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is testing use-fixtures]]
             [clojure.edn :as edn]
             [clj-http.client :as client]
+            [datahike-server.database :as db]
             [datahike-server.core :refer [start-all stop-all]]))
 
 (defn no-env [xs]
@@ -43,10 +44,19 @@
            (:info (api-request :get
                                "/swagger.json"
                                nil))))))
-
+                               
 (deftest create-test
   (testing "Get and create a databases"
-    (let [a1  [{:store {:backend :firebase 
+    (let [a1  [{:store {:backend :mem
+                        :id "default"}
+                :schema-flexibility :read
+                :keep-history? false
+                :name "default"
+                :index :datahike.index/hitchhiker-tree
+                :attribute-refs? false,
+                :cache-size 100000,
+                :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}
+              {:store {:backend :firebase 
                         :db test-root
                         :root "sessions"},
                 :initial-tx [{:name "Alice", :age 20}
@@ -83,8 +93,32 @@
                               :keep-history? true
                               :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}})
-            a5 (no-env (db/scan-stores {:databases [{:store {:db test-root}}]}))]
-                          
+            a5 (no-env (conj (db/scan-stores {:databases [{:store {:db test-root}}]}) db/memdb))
+            a6 (api-request :post "/transact"
+                        {:tx-data [{:foo 1}]}
+                        {:headers {:authorization "token neverusethisaspassword"
+                                   :db-name "testing"}})
+            a7 (api-request :post "/datoms"
+                                    {:index :aevt
+                                     :components [:foo]}
+                                    {:headers {:authorization "token neverusethisaspassword"
+                                               :db-name "testing"}})
+            _  (api-request :post "/transact"
+                        {:tx-data [{:foo 2 :bar 4}]}
+                        {:headers {:authorization "token neverusethisaspassword"
+                                   :db-name "testing"}})
+            tx (-> a6 :tx-data first (nth 3))
+            a8 (api-request :post "/datoms"
+                                    {:index :aevt
+                                     :components [:foo]}
+                                    {:headers {:authorization "token neverusethisaspassword"
+                                               :db-name "testing"}})
+            a9 (api-request :post "/datoms"
+                                    {:index :aevt
+                                     :components [:foo]}
+                                    {:headers {:authorization "token neverusethisaspassword"
+                                               :db-name "testing"
+                                               :db-tx tx}})]
       (is (= (sort-by :name a1) (sort-by :name a2)))
       (is (not= (sort-by :name a2) (sort-by :name a3)))
       (is (= (sort-by :name a3) (sort-by :name (:databases a4))))
@@ -92,7 +126,10 @@
       (is (= (count a1) (count a2)))
       (is (= (count a3) (count (:databases a4))))
       (is (< (count a2) (count a3)))
-      (is (true? (:error a4))))))
+      (is (true? (:error a4)))
+      (is (< (count a7) (count a8)))
+      (is (= a7 a9))
+      (is (not= a7 a8)))))
 
 (deftest transact-test
   (testing "Transact values"
