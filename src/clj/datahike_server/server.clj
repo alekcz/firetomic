@@ -25,7 +25,8 @@
             [mount.core :refer [defstate]]
             [ring.adapter.jetty :refer [run-jetty]]
             [clojure.pprint :refer [pprint]]
-            [spec-tools.core :as st]))
+            [spec-tools.core :as st]
+            [org.httpkit.server :refer [run-server server-stop!]]))
 
 (s/def ::entity any?)
 (s/def ::tx-data (s/coll-of ::entity))
@@ -238,11 +239,11 @@
                  :access-control-allow-methods [:get :put :post :delete])))
 
 (defn start-server [config]
-  (run-jetty app (:server config)))
+  (run-server app (merge {:legacy-return-value? false} (:server config))))
 
 (defstate server
   :start (do
            (log/debug "Starting server")
            (start-server config))
-  :stop (.stop server))
+  :stop (server-stop! server))
 

@@ -1,6 +1,10 @@
-# Firetomic
-
-[![CI](https://github.com/alekcz/firetomic/actions/workflows/main.yml/badge.svg)](https://github.com/alekcz/firetomic/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/alekcz/firetomic/branch/main/graph/badge.svg?token=UkLQlpnfbp)](https://codecov.io/gh/alekcz/firetomic)   
+<p align="center">
+    <img alt="Firetomic" src="./resources/wordmark-dark.svg" height="128em">
+</p>
+<p align="center">
+  <a href="https://github.com/alekcz/firetomic/actions/workflows/main.yml"><img src="https://github.com/alekcz/firetomic/actions/workflows/main.yml/badge.svg"/></a>
+  <a href="https://codecov.io/gh/alekcz/firetomic/branch/main/graph/badge.svg?token=UkLQlpnfbp"><img src="https://codecov.io/gh/alekcz/firetomic"/></a>
+</p>
 
 ## Deploy Firetomic
 
