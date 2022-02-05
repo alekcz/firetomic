@@ -1,5 +1,5 @@
 { :name 'alekcz/firetomic
-  :version "0.1.0-SNAPSHOT"
+  :version "0.1.2"
   :description "Firetomic: Datahike Server with Firebase as the backend"
   :url "https://github.com/alekcz/firetomic"
   :license {:name "EPL-2.0 License"
@@ -7,10 +7,10 @@
  
   :deps { org.clojure/clojure       {:mvn/version "1.10.3"}
           io.replikativ/datahike    {:mvn/version "0.4.1479"}
-          alekcz/datahike-firebase  {:mvn/version "0.2.0-20220125.093709-10"}
+          alekcz/datahike-firebase  {:mvn/version "0.2.0"}
           buddy/buddy-auth          {:mvn/version "3.0.1"}
           ring/ring                 {:mvn/version "1.9.4"}
-          http-kit/http-kit         {:mvn/version "2.6.0-alpha1"}
+          http-kit/http-kit         {:mvn/version "2.5.3"}
           metosin/reitit            {:mvn/version "0.5.15"}
           ring-cors/ring-cors       {:mvn/version "0.1.13"}
           com.taoensso/timbre       {:mvn/version "5.1.2"}
