@@ -44,6 +44,7 @@ jobs:
       - name: Run tests
         env: 
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          FIRETOMIC_FIREBASE_AUTH: ${{ secrets.FIRETOMIC_FIREBASE_AUTH }}
         run: |
           mkdir -p ~/.npm-global
           npm config set prefix '~/.npm-global'
