@@ -7,7 +7,7 @@
  
   :deps { org.clojure/clojure       {:mvn/version "1.10.3"}
           io.replikativ/datahike    {:mvn/version "0.4.1479"}
-          alekcz/datahike-firebase  {:mvn/version "0.2.0"}
+          alekcz/datahike-firebase  {:mvn/version "0.2.2"}
           buddy/buddy-auth          {:mvn/version "3.0.1"}
           ring/ring                 {:mvn/version "1.9.4"}
           http-kit/http-kit         {:mvn/version "2.5.3"}

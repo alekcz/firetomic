@@ -10,3 +10,4 @@ tmp-*
 .clj-kondo
 .circleci
 .github
+/temp

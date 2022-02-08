@@ -9,6 +9,10 @@
   ([data] {:status 200 :body data})
   ([] {:status 200}))
 
+(defn invalid
+  ([data] {:status 400 :body data})
+  ([] {:status 400}))
+
 (defn list-databases-helper []
   (let [xf (comp
             (map deref)
@@ -75,6 +79,19 @@
     (db/add-database body)
     (success (list-databases-helper)) 
     (catch Exception e
-      (success (merge (list-databases-helper)
-                      {:error true
-                       :message (.getMessage e)})))))
+      (invalid (merge {:error true
+                       :message (.getMessage e)}
+                       (list-databases-helper))))))
+
+(defn backup-database [{{:keys [body]} :parameters}]
+  (success {:url (db/backup-database body)}))
+  
+(defn restore-database [{{:keys [body]} :parameters}]
+  (try
+    (success {:url (db/restore-database body)})
+    (catch Exception e
+      (invalid {:error true
+                :message (.getMessage e)}))))
+
+(defn delete-database [{{:keys [body]} :parameters}]
+  (success {:url (db/delete-database body)}))                

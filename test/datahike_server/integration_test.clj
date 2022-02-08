@@ -5,6 +5,7 @@
             [datahike-server.database :as db]
             [datahike-server.config :as dc]
             [clj-http.client :as client]
+            [taoensso.timbre :as log]
             [datahike-server.core :refer [start-all stop-all -main]]))
 
 (defn no-env [xs]
@@ -16,6 +17,7 @@
     ""))
 
 (def test-root "http://localhost:9000/prod")
+(def fb-root "https://alekcz-dev.firebaseio.com/firetomic-test")
 
 (defn api-request
   ([method url]
@@ -34,7 +36,15 @@
 
 (defn setup-db [f]
   (start-all)
+  (db/delete-database {:firebase-url fb-root :name "testing"})
+  (db/delete-database {:firebase-url fb-root :name "testing"})
   (f)
+  (api-request :post "/delete-database"
+    {:firebase-url fb-root
+     :name "testing"
+     :keep-history? true
+     :schema-flexibility :read}
+    {:headers {:authorization "token neverusethisaspassword"}})
   (stop-all)
   (-main nil)
   (stop-all))
@@ -95,18 +105,26 @@
                               nil
                               {:headers {:authorization "token neverusethisaspassword"}}))
             a3 (:databases (api-request :post "/create-database"
-                              {:firebase-url test-root
-                              :name "testing",
-                              :keep-history? true
-                              :schema-flexibility :read}
+                              {:firebase-url fb-root
+                               :name "testing",
+                               :keep-history? true
+                               :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}}))
-            a4 (api-request :post "/create-database"
-                              {:firebase-url test-root
+            a4 (try
+                (api-request :post "/create-database"
+                              {:firebase-url fb-root
                               :name "testing"
                               :keep-history? true
                               :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}})
-            a5 (no-env (conj (db/scan-stores {:databases [{:store {:db test-root}}]}) db/memdb))
+                (catch Exception _ "failed"))
+            a5 (no-env (conj (db/scan-stores {:databases [{:store {:db test-root}} {:store {:db fb-root}}]}) db/memdb))
+            b1 (:url (api-request :post "/backup-database"
+                        {:firebase-url fb-root
+                          :name "testing",
+                          :keep-history? true
+                          :schema-flexibility :read}
+                        {:headers {:authorization "token neverusethisaspassword"}}))
             a6 (api-request :post "/transact"
                         {:tx-data [{:foo 1}]}
                         {:headers {:authorization "token neverusethisaspassword"
@@ -120,6 +138,12 @@
                         {:tx-data [{:foo 2 :bar 4}]}
                         {:headers {:authorization "token neverusethisaspassword"
                                    :db-name "testing"}})
+            b2 (:url (api-request :post "/backup-database"
+                        {:firebase-url fb-root
+                          :name "testing",
+                          :keep-history? true
+                          :schema-flexibility :read}
+                        {:headers {:authorization "token neverusethisaspassword"}}))      
             tx (-> a6 :tx-data first (nth 3))
             a8 (api-request :post "/datoms"
                                     {:index :aevt
@@ -131,18 +155,42 @@
                                      :components [:foo]}
                                     {:headers {:authorization "token neverusethisaspassword"
                                                :db-name "testing"
-                                               :db-tx tx}})]
+                                               :db-tx tx}})
+            _ (api-request :post "/restore-database"
+                          {:firebase-url fb-root
+                           :name "testing",
+                           :keep-history? true
+                           :schema-flexibility :read
+                           :backup-url b1}
+                          {:headers {:authorization "token neverusethisaspassword"}})
+            a10 (api-request :post "/datoms"
+                                    {:index :aevt
+                                     :components [:foo]}
+                                    {:headers {:authorization "token neverusethisaspassword"
+                                               :db-name "testing"}})
+            _ (api-request :post "/restore-database"
+                          {:firebase-url fb-root
+                           :name "testing",
+                           :keep-history? true
+                           :schema-flexibility :read
+                           :backup-url b2}
+                          {:headers {:authorization "token neverusethisaspassword"}})
+            a11 (api-request :post "/datoms"
+                                    {:index :aevt
+                                     :components [:foo]}
+                                    {:headers {:authorization "token neverusethisaspassword"
+                                               :db-name "testing"}})]
       (is (= (sort-by :name a1) (sort-by :name a2)))
       (is (not= (sort-by :name a2) (sort-by :name a3)))
-      (is (= (sort-by :name a3) (sort-by :name (:databases a4))))
       (is (= (sort-by :name a3) (sort-by :name a5)))
       (is (= (count a1) (count a2)))
-      (is (= (count a3) (count (:databases a4))))
       (is (< (count a2) (count a3)))
-      (is (true? (:error a4)))
+      (is (= "failed" a4))
       (is (< (count a7) (count a8)))
       (is (= a7 a9))
-      (is (not= a7 a8)))))
+      (is (not= a7 a8))
+      (is (= 0 (count a10)))
+      (is (= 2 (count a11))))))
 
 (deftest transact-test
   (testing "Transact values"

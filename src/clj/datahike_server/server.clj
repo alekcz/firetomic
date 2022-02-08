@@ -64,12 +64,15 @@
 (s/def ::params map?)
 
 (s/def ::firebase-url (s/and string? #(try (url/url %) (catch Throwable _ false))))
+(s/def ::backup-url string?)
 
 (s/def ::name string?)
 (s/def ::keep-history? boolean?)
 (s/def ::schema-flexibility keyword?)
 
 (s/def ::database (s/keys :req-un [::firebase-url ::name ::keep-history? ::schema-flexibility]))
+
+(s/def ::restorable-database (s/keys :req-un [::firebase-url ::name ::keep-history? ::schema-flexibility ::backup-url]))
 
 (def routes
   [["/ping"
@@ -97,6 +100,33 @@
                                               :name "database"})}
                :middleware [middleware/token-auth middleware/auth]
                :handler    h/create-database}}]
+
+   ["/backup-database"
+    {:swagger {:tags ["API"]}
+     :post    {:operationId "BackupDatabase"
+               :summary "Backup a firetomic database"
+               :parameters {:body   (st/spec {:spec ::database
+                                              :name "backup"})}
+               :middleware [middleware/token-auth middleware/auth]
+               :handler    h/backup-database}}]
+
+   ["/restore-database"
+    {:swagger {:tags ["API"]}
+     :post    {:operationId "RestoreDatabase"
+               :summary "Create a new firetomic database"
+               :parameters {:body   (st/spec {:spec ::restorable-database
+                                              :name "restore"})}
+               :middleware [middleware/token-auth middleware/auth]
+               :handler    h/restore-database}}]
+
+   ["/delete-database"
+    {:swagger {:tags ["API"]}
+     :post    {:operationId "DeleteDatabase"
+               :summary "Delete a existing firetomic database"
+               :parameters {:body   (st/spec {:spec ::database
+                                              :name "database"})}
+               :middleware [middleware/token-auth middleware/auth]
+               :handler    h/delete-database}}]                      
 
    ["/transact"
     {:swagger {:tags ["API"]}

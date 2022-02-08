@@ -3,9 +3,13 @@
             [taoensso.timbre :as log]
             [datahike-server.config :refer [config]]
             [datahike-firebase.core]
+            [datahike.migrate :refer [export-db import-db]]
             [datahike.api :as d]
             [fire.core :as fire]
-            [fire.auth :as auth])
+            [fire.auth :as auth]
+            [fire.storage :as storage]
+            [clojure.string :as str]
+            [clojure.java.io :as io])
   (:import [java.util UUID]))
 
 (def memdb {:store {:backend :mem
@@ -52,7 +56,15 @@
   :stop (for [conn (vals conns)]
           (d/release conn)))
 
-(defn add-database [{:keys [firebase-url name keep-history? schema-flexibility]}]
+(defn load-datoms [conn backup-url]
+  (let [auth (auth/create-token "FIRETOMIC_FIREBASE_AUTH")
+        temp (str "temp/" backup-url)]
+    (io/make-parents temp)
+    (storage/download-to-file backup-url temp auth)
+    (log/infof (str "Restoring database from " backup-url "..."))
+    (import-db conn temp)))
+
+(defn add-database [{:keys [firebase-url name keep-history? schema-flexibility backup-url]}]
   (let [cfg { :store {:backend :firebase 
                       :db firebase-url
                       :root name
@@ -69,7 +81,69 @@
       (log/infof "Creating database...")
       (d/create-database cfg)  
       (log/infof "Done"))
-    (let [new-conns (assoc conns name (d/connect cfg))]
+    (let [new-one (d/connect cfg)
+          new-conns (assoc conns name new-one)]
+      (when backup-url 
+        (load-datoms new-one backup-url))
       (-> 
-      (mount/swap {#'datahike-server.database/conns new-conns})
-      (mount/start)))))
+        (mount/swap {#'datahike-server.database/conns new-conns})
+        (mount/start)))))
+
+(defn backup-database [{:keys [firebase-url name keep-history? schema-flexibility]}]
+  (let [cfg { :store {:backend :firebase 
+                      :db firebase-url
+                      :root name
+                      :env "FIRETOMIC_FIREBASE_AUTH"}
+              :name name
+              :keep-history? keep-history?
+              :schema-flexibility schema-flexibility}
+        auth (auth/create-token "FIRETOMIC_FIREBASE_AUTH")
+        name (-> cfg :store :db (str/replace "https://" "") (str/replace "http://" "") (str/replace "." "-") (str/replace "/" "-"))
+        date (new java.util.Date)
+        day (.format (java.text.SimpleDateFormat. "YYYY-MM-dd") date)
+        full-date (.format (java.text.SimpleDateFormat. "YYYY-MM-dd-HH-mm-ss") date)
+        final-name (str "backups/" name "/" day "/" name "-" full-date ".backup.edn")
+        temp (str "temp/" final-name)]
+    (when (d/database-exists? cfg)
+      (let [connection (d/connect cfg)]
+        (log/infof (str "Backing up database to " final-name "..."))
+        (io/make-parents temp)
+        (export-db @connection temp)  
+        (storage/upload! final-name temp "application/edn" auth)
+        (log/infof "Done")
+        final-name))))
+
+(defn restore-database [{:keys [firebase-url name keep-history? schema-flexibility backup-url]}]
+  (let [cfg { :store {:backend :firebase 
+                      :db firebase-url
+                      :root name
+                      :env "FIRETOMIC_FIREBASE_AUTH"}
+              :name name
+              :keep-history? keep-history?
+              :schema-flexibility schema-flexibility}]
+    (when (d/database-exists? cfg) 
+      (log/infof "Purging database...")
+      (d/delete-database cfg))
+    (d/create-database cfg)  
+    (let [new-conn (d/connect cfg)]
+      (load-datoms new-conn backup-url)
+      (-> 
+        {#'datahike-server.database/conns (assoc conns name new-conn)}
+        (mount/swap)
+        (mount/start))
+      (log/infof "Done"))))
+   
+(defn delete-database [{:keys [firebase-url name]}]
+  (let [cfg { :store {:backend :firebase 
+                      :db firebase-url
+                      :root name
+                      :env "FIRETOMIC_FIREBASE_AUTH"}
+              :name name}]
+    (when (d/database-exists? cfg) 
+      (log/infof "Deleting database...")
+      (d/delete-database cfg)
+      (log/infof "Done")
+      (-> 
+        (mount/swap {#'datahike-server.database/conns (dissoc conns name)})
+        (mount/start)))))
+    

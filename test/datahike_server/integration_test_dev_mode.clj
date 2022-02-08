@@ -128,7 +128,7 @@
       (is (< (count a2) (count a3)))
       (is (true? (:error a4)))
       (is (< (count a7) (count a8)))
-      (is (= a7 a9))
+      (is (= a7 0 a9))
       (is (not= a7 a8)))))
 
 (deftest transact-test
