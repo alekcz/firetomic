@@ -1,5 +1,4 @@
 (ns datahike-server.config
-  (:gen-class)
   (:require [clojure.spec.alpha :as s]
             [taoensso.timbre :as log]
             [mount.core :refer [defstate]]
@@ -28,8 +27,8 @@
 (defn load-config-file [config-file]
   (try
     (-> config-file slurp read-string)
-    (catch FileNotFoundException _e (log/info "No config file found at " config-file))
-    (catch RuntimeException _e (log/info "Could not validate edn in config file " config-file))))
+    (catch FileNotFoundException e (log/info "No config file found at " config-file))
+    (catch RuntimeException e (log/info "Could not validate edn in config file " config-file))))
 
 (defn load-config
   "Loads config for Datahike server
@@ -38,6 +37,7 @@
   [config-file]
   (let [config-from-file (load-config-file config-file)
         token (keyword (:firetomic-token env nil))
+        _ (println token)
         server-config (merge
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
                         :loglevel (keyword (:firetomic-loglevel env :debug))

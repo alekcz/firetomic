@@ -27,9 +27,7 @@ jobs:
         uses: DeLaGuardo/setup-clojure@5.0
         with:
           cli: latest 
-          lein: latest   
-          boot: latest   
-
+          
       - name: Cache deps
         uses: actions/cache@v1
         id: cache-deps

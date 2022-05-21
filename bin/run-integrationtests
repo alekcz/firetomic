@@ -19,7 +19,6 @@ function test_dev_mode() {
 }
 function teardown() {
     mv resources/config.edn.tmp resources/config.edn &> /dev/null | rm resources/config.edn
-    cat /tmp/clojure*.edn
 }
 
 setup
