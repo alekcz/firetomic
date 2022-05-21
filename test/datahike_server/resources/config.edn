@@ -1,8 +1,6 @@
 {:databases [{:store {:backend :firebase 
                       :db "http://localhost:9000/prod" 
                       :root "sessions"}
-              :initial-tx [{:name "Alice", :age 20}
-                           {:name "Bob", :age 21}]
               :schema-flexibility :read
               :keep-history? false
               :name "sessions"}

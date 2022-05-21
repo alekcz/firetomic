@@ -64,9 +64,9 @@
     (log/infof (str "Restoring database from " backup-url "..."))
     (import-db conn temp)))
 
-(defn add-database [{:keys [firebase-url name keep-history? schema-flexibility backup-url]}]
+(defn add-database [{:keys [db name keep-history? schema-flexibility backup-url]}]
   (let [cfg { :store {:backend :firebase 
-                      :db firebase-url
+                      :db db
                       :root name
                       :env "FIRETOMIC_FIREBASE_AUTH"}
               :name name
@@ -89,9 +89,9 @@
         (mount/swap {#'datahike-server.database/conns new-conns})
         (mount/start)))))
 
-(defn backup-database [{:keys [firebase-url name keep-history? schema-flexibility]}]
+(defn backup-database [{:keys [db name keep-history? schema-flexibility]}]
   (let [cfg { :store {:backend :firebase 
-                      :db firebase-url
+                      :db db
                       :root name
                       :env "FIRETOMIC_FIREBASE_AUTH"}
               :name name
@@ -108,14 +108,14 @@
       (let [connection (d/connect cfg)]
         (log/infof (str "Backing up database to " final-name "..."))
         (io/make-parents temp)
-        (export-db @connection temp)  
+        (export-db connection temp)  
         (storage/upload! final-name temp "application/edn" auth)
         (log/infof "Done")
         final-name))))
 
-(defn restore-database [{:keys [firebase-url name keep-history? schema-flexibility backup-url]}]
+(defn restore-database [{:keys [db name keep-history? schema-flexibility backup-url]}]
   (let [cfg { :store {:backend :firebase 
-                      :db firebase-url
+                      :db db
                       :root name
                       :env "FIRETOMIC_FIREBASE_AUTH"}
               :name name
@@ -133,9 +133,9 @@
         (mount/start))
       (log/infof "Done"))))
    
-(defn delete-database [{:keys [firebase-url name]}]
+(defn delete-database [{:keys [db name]}]
   (let [cfg { :store {:backend :firebase 
-                      :db firebase-url
+                      :db db
                       :root name
                       :env "FIRETOMIC_FIREBASE_AUTH"}
               :name name}]
@@ -147,3 +147,11 @@
         (mount/swap {#'datahike-server.database/conns (dissoc conns name)})
         (mount/start)))))
     
+(defn cleanup-databases []
+  (stop #'datahike-server.database/conns)
+  (doseq [cfg (:databases config)]
+    (log/infof "Purging " cfg " ...")
+    (when (d/database-exists? cfg) 
+      (d/delete-database cfg))
+    (log/infof "Done"))
+  (start #'datahike-server.database/conns))

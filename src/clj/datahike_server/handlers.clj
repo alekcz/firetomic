@@ -25,7 +25,7 @@
   (success (list-databases-helper)))
 
 (defn get-db [{:keys [conn]}]
-  (success {:tx (dd/-max-tx @conn)}))
+  (success {:hash (hash @conn)}))
 
 (defn cleanup-result [result]
   (-> result
@@ -71,9 +71,23 @@
                     c/touch
                     (into {}))))))
 
-(defn schema [{:keys [conn]}]
-  (success (dd/-schema @conn)))
-  
+(defn schema [{:keys [conn]}]        
+  (success (d/schema @conn)))
+
+(defn reverse-schema [{:keys [conn]}]
+  (success (d/reverse-schema @conn)))
+
+(defn index-range [{{{:keys [attrid start end]} :body} :parameters conn :conn db :db}]
+  (let [db (or db @conn)]
+    (success (d/index-range db {:attrid attrid
+                                :start  start
+                                :end    end}))))
+
+(defn load-entities [{{{:keys [entities]} :body} :parameters conn :conn}]
+  (-> @(d/load-entities conn entities)
+      cleanup-result
+      success))
+      
 (defn create-database [{{:keys [body]} :parameters}]
   (try
     (db/add-database body)
@@ -84,6 +98,7 @@
                        (list-databases-helper))))))
 
 (defn backup-database [{{:keys [body]} :parameters}]
+  (println body)
   (success {:url (db/backup-database body)}))
   
 (defn restore-database [{{:keys [body]} :parameters}]
@@ -94,4 +109,4 @@
                 :message (.getMessage e)}))))
 
 (defn delete-database [{{:keys [body]} :parameters}]
-  (success {:url (db/delete-database body)}))                
+  (success {:url (db/delete-database body)}))       
