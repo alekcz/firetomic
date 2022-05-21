@@ -3,7 +3,9 @@
             [taoensso.timbre :as log]
             [mount.core :refer [defstate]]
             [environ.core :refer [env]]
-            [datahike.config :refer [int-from-env bool-from-env]]))
+            [datahike.config :refer [int-from-env bool-from-env]])
+  (:import  [java.io FileNotFoundException]
+            [java.lang RuntimeException]))
 
 (s/fdef load-config-file
   :args (s/cat :config-file string?)
@@ -25,8 +27,8 @@
 (defn load-config-file [config-file]
   (try
     (-> config-file slurp read-string)
-    (catch java.io.FileNotFoundException e (log/info "No config file found at " config-file))
-    (catch RuntimeException e (log/info "Could not validate edn in config file " config-file))))
+    (catch FileNotFoundException _e (log/info "No config file found at " config-file))
+    (catch RuntimeException _e (log/info "Could not validate edn in config file " config-file))))
 
 (defn load-config
   "Loads config for Datahike server
