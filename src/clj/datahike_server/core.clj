@@ -1,5 +1,4 @@
 (ns datahike-server.core
-  (:gen-class)
   (:require [mount.core :as mount]
             [taoensso.timbre :as log]
             [datahike-server.config :refer [config]]
