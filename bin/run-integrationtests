@@ -24,3 +24,4 @@ function teardown() {
 setup
 test_auth
 #test_dev_mode
+cat /tmp/clojure*.edn
