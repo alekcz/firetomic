@@ -57,6 +57,7 @@ jobs:
           FIRETOMIC_FIREBASE_AUTH: ${{ secrets.FIRETOMIC_FIREBASE_AUTH }}
         run: |
           clojure -M -e "*clojure-version*"
+          java -version
           mkdir -p ~/.npm-global
           npm config set prefix '~/.npm-global'
           export PATH=~/.npm-global/bin:$PATH
