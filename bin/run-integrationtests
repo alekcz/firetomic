@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -o errexit
+# set -o errexit
 
-trap teardown EXIT
+# trap teardown EXIT
 
 function setup() {
     mv resources/config.edn resources/config.edn.tmp &> /dev/null | true
