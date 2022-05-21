@@ -1,4 +1,5 @@
 (ns datahike-server.config
+  (:gen-class)
   (:require [clojure.spec.alpha :as s]
             [taoensso.timbre :as log]
             [mount.core :refer [defstate]]
@@ -37,7 +38,6 @@
   [config-file]
   (let [config-from-file (load-config-file config-file)
         token (keyword (:firetomic-token env nil))
-        _ (println token)
         server-config (merge
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
                         :loglevel (keyword (:firetomic-loglevel env :debug))
