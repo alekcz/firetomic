@@ -64,3 +64,4 @@ jobs:
           source ~/.profile
           npm install -g firebase-tools@10.1.2
           bash test.sh
+          awk '{print}' /tmp/clojure*.edn
