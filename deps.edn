@@ -17,7 +17,8 @@
           environ/environ           {:mvn/version "1.2.0"}
           mount/mount               {:mvn/version "0.1.16"}
           metosin/spec-tools        {:mvn/version "0.10.5"}
-          com.cemerick/url          {:mvn/version "0.1.1"}}
+          com.cemerick/url          {:mvn/version "0.1.1"}
+          org.graalvm.nativeimage/native-image-maven-plugin {:mvn/version "20.3.6.1"}} 
 
  :paths ["src/clj"]
 
@@ -49,7 +50,8 @@
                   :main-opts ["-m" "cljfmt.main" "fix"]}
 
 
-           :build {:deps       {io.github.clojure/tools.build   {:git/tag "v0.8.1" :git/sha "7d40500"}
+           :build {:extra-deps       
+                               {io.github.clojure/tools.build {:git/tag "v0.8.2" :git/sha "ba1a2bf"}
                                 slipset/deps-deploy             {:mvn/version "0.2.0"}
                                 borkdude/gh-release-artifact    {:git/url "https://github.com/borkdude/gh-release-artifact"
                                                                  :sha     "a83ee8da47d56a80b6380cbb6b4b9274048067bd"}

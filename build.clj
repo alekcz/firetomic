@@ -21,7 +21,7 @@
   [_]
   (b/delete {:path "target"}))
 
-(defn compile
+(defn compiler
   [_]
   (b/javac {:src-dirs ["java"]
             :class-dir class-dir
@@ -30,7 +30,7 @@
 
 (defn jar
   [_]
-  (compile nil)
+  (compiler nil)
   (b/write-pom {:class-dir class-dir
                 :src-pom "./template/pom.xml"
                 :lib lib
