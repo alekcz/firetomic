@@ -17,8 +17,7 @@
           environ/environ           {:mvn/version "1.2.0"}
           mount/mount               {:mvn/version "0.1.16"}
           metosin/spec-tools        {:mvn/version "0.10.5"}
-          com.cemerick/url          {:mvn/version "0.1.1"}
-          org.graalvm.nativeimage/native-image-maven-plugin {:mvn/version "20.3.6.1"}} 
+          com.cemerick/url          {:mvn/version "0.1.1"}} 
 
  :paths ["src/clj"]
 

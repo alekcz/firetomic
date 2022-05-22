@@ -5,7 +5,6 @@
             [environ.core :refer [env]]
             [datahike.config :refer [int-from-env bool-from-env]])
   (:import  [java.io FileNotFoundException]
-            [org.graalvm.nativeimage ImageInfo]
             [java.lang RuntimeException]))
 
 (s/fdef load-config-file

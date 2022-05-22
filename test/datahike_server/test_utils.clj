@@ -37,6 +37,13 @@
                    :schema-flexibility :read}
                   {:headers {:authorization "token neverusethisaspassword"}})
   (f)
+  (cleanup-databases)
+  (api-request :post "/delete-database"
+                  {:db fb-root
+                   :name "testing"
+                   :keep-history? true
+                   :schema-flexibility :read}
+                  {:headers {:authorization "token neverusethisaspassword"}})
   (stop-all))
 
 (defn no-env [xs]
