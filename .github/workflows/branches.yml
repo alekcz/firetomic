@@ -15,23 +15,28 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
       
+      - name: Prepare java
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+
       - name: Install clojure tools
-        uses: DeLaGuardo/setup-clojure@3.7
+        uses: DeLaGuardo/setup-clojure@5.0
         with:
           cli: latest 
-          lein: latest   
-          boot: latest   
-
+          
       - name: Cache deps
         uses: actions/cache@v1
         id: cache-deps
         with:
-          path: ~/.m2/repository
+          path: .cpcache/
           key: ${{ runner.os }}-maven-${{ hashFiles('deps.edn') }}
           restore-keys: |
                 ${{ runner.os }}-maven-
@@ -49,9 +54,12 @@ jobs:
         env: 
           FIRETOMIC_FIREBASE_AUTH: ${{ secrets.FIRETOMIC_FIREBASE_AUTH }}
         run: |
+          clojure -M -e "*clojure-version*"
+          java -version
           mkdir -p ~/.npm-global
           npm config set prefix '~/.npm-global'
           export PATH=~/.npm-global/bin:$PATH
           source ~/.profile
           npm install -g firebase-tools@10.1.2
           bash test.sh
+          

@@ -1,10 +1,10 @@
 (ns datahike-server.core
-  (:gen-class)
   (:require [mount.core :as mount]
             [taoensso.timbre :as log]
             [datahike-server.config :refer [config]]
             [datahike-server.database]
-            [datahike-server.server]))
+            [datahike-server.server])
+   (:gen-class))
 
 (defn start-all []
   (mount/start))

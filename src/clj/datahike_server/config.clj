@@ -3,7 +3,9 @@
             [taoensso.timbre :as log]
             [mount.core :refer [defstate]]
             [environ.core :refer [env]]
-            [datahike.config :refer [int-from-env bool-from-env]]))
+            [datahike.config :refer [int-from-env bool-from-env]])
+  (:import  [java.io FileNotFoundException]
+            [java.lang RuntimeException]))
 
 (s/fdef load-config-file
   :args (s/cat :config-file string?)
@@ -25,7 +27,7 @@
 (defn load-config-file [config-file]
   (try
     (-> config-file slurp read-string)
-    (catch java.io.FileNotFoundException e (log/info "No config file found at " config-file))
+    (catch FileNotFoundException e (log/info "No config file found at " config-file))
     (catch RuntimeException e (log/info "Could not validate edn in config file " config-file))))
 
 (defn load-config
@@ -46,7 +48,7 @@
                                   server-config
                                   (throw (ex-info "Server configuration error:" (s/explain-data ::server-config server-config))))
         firetomic-config  {:store { :backend :firebase 
-                                    :db (or (env :firetomic-firebase-url) "http://localhost:9000")
+                                    :db (or (env :firetomic-db) "http://localhost:9000")
                                     :root (env :firetomic-name)
                                     :env "FIRETOMIC_FIREBASE_AUTH"}
                             :name (env :firetomic-name)

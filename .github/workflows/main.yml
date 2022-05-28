@@ -14,15 +14,20 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
       
+      - name: Prepare java
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+
       - name: Install clojure tools
-        uses: DeLaGuardo/setup-clojure@3.7
+        uses: DeLaGuardo/setup-clojure@5.0
         with:
           cli: latest 
-          lein: latest   
-          boot: latest   
-
+          
       - name: Cache deps
         uses: actions/cache@v1
         id: cache-deps
@@ -46,6 +51,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           FIRETOMIC_FIREBASE_AUTH: ${{ secrets.FIRETOMIC_FIREBASE_AUTH }}
         run: |
+          clojure -M -e "*clojure-version*"
           mkdir -p ~/.npm-global
           npm config set prefix '~/.npm-global'
           export PATH=~/.npm-global/bin:$PATH

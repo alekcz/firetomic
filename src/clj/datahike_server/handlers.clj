@@ -25,7 +25,7 @@
   (success (list-databases-helper)))
 
 (defn get-db [{:keys [conn]}]
-  (success {:tx (dd/-max-tx @conn)}))
+  (success {:hash (hash @conn)}))
 
 (defn cleanup-result [result]
   (-> result
@@ -71,9 +71,23 @@
                     c/touch
                     (into {}))))))
 
-(defn schema [{:keys [conn]}]
-  (success (dd/-schema @conn)))
-  
+(defn schema [{:keys [conn]}]        
+  (success (d/schema @conn)))
+
+(defn reverse-schema [{:keys [conn]}]
+  (success (d/reverse-schema @conn)))
+
+(defn index-range [{{{:keys [attrid start end]} :body} :parameters conn :conn db :db}]
+  (let [db (or db @conn)]
+    (success (d/index-range db {:attrid attrid
+                                :start  start
+                                :end    end}))))
+
+(defn load-entities [{{{:keys [entities]} :body} :parameters conn :conn}]
+  (-> @(d/load-entities conn entities)
+      cleanup-result
+      success))
+      
 (defn create-database [{{:keys [body]} :parameters}]
   (try
     (db/add-database body)
@@ -83,15 +97,18 @@
                        :message (.getMessage e)}
                        (list-databases-helper))))))
 
-(defn backup-database [{{:keys [body]} :parameters}]
-  (success {:url (db/backup-database body)}))
-  
-(defn restore-database [{{:keys [body]} :parameters}]
+(defn backup-database [{{:keys [body]} :parameters conn :conn db :db}]
   (try
-    (success {:url (db/restore-database body)})
+    (let [db (or db @conn)]
+      (success {:backup-url (db/backup-database (:backup-name body) conn)}))
     (catch Exception e
-      (invalid {:error true
-                :message (.getMessage e)}))))
-
+        (.printStackTrace e)
+        (invalid (merge {:error true
+                        :message (.getMessage e)}
+                        (list-databases-helper))))))
+  
+(defn restore-database [{{:keys [body]} :parameters _conn :conn _db :db}]
+  (success {:backup-url (db/restore-database body)}))
+  
 (defn delete-database [{{:keys [body]} :parameters}]
-  (success {:url (db/delete-database body)}))                
+  (success {:url (db/delete-database body)}))       

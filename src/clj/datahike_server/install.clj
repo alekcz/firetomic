@@ -1,5 +1,4 @@
-(ns datahike-server.install
-  (:gen-class))
+(ns datahike-server.install)
 
 (defn install [_]
   (print "dependencies downloaded"))

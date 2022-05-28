@@ -25,6 +25,9 @@
             [spec-tools.core :as st]
             [org.httpkit.server :refer [run-server server-stop!]]))
 
+(defn long? [x]
+  (instance? java.lang.Long x))
+
 (s/def ::entity any?)
 (s/def ::tx-data (s/coll-of ::entity))
 (s/def ::tx-meta (s/coll-of ::entity))
@@ -54,6 +57,8 @@
 (s/def ::db-name string?)
 (s/def ::query-id number?)
 
+(s/def ::attrids [])
+
 (s/def ::conn-header (s/keys :req-un [::db-name]))
 
 (s/def ::db-hash number?)
@@ -63,16 +68,19 @@
                            :opt-un [::db-tx]))
 (s/def ::params map?)
 
-(s/def ::firebase-url (s/and string? #(try (url/url %) (catch Throwable _ false))))
+(s/def ::db (s/and string? #(try (url/url %) (catch Throwable _ false))))
 (s/def ::backup-url string?)
 
 (s/def ::name string?)
 (s/def ::keep-history? boolean?)
 (s/def ::schema-flexibility keyword?)
 
-(s/def ::database (s/keys :req-un [::firebase-url ::name ::keep-history? ::schema-flexibility]))
+(s/def ::database (s/keys :req-un [::db ::name ::keep-history? ::schema-flexibility]))
 
-(s/def ::restorable-database (s/keys :req-un [::firebase-url ::name ::keep-history? ::schema-flexibility ::backup-url]))
+(s/def ::restorable-database (s/keys :req-un [::db ::name ::keep-history? ::schema-flexibility ::backup-url]))
+(s/def :entity/vector (s/cat :e long? :a keyword? :v any? :t long? :added boolean?))
+(s/def ::entities (s/coll-of :entity/vector))
+(s/def ::imported-entities (s/keys :req-un [::entities]))
 
 (def routes
   [["/ping"
@@ -105,7 +113,7 @@
     {:swagger {:tags ["API"]}
      :post    {:operationId "BackupDatabase"
                :summary "Backup a firetomic database"
-               :parameters {:body   (st/spec {:spec ::database
+               :parameters {:body   (st/spec {:spec ::params
                                               :name "backup"})}
                :middleware [middleware/token-auth middleware/auth]
                :handler    h/backup-database}}]
@@ -220,7 +228,24 @@
                :summary    "Fetches current schema"
                :parameters {:header ::db-header}
                :middleware [middleware/token-auth middleware/auth]
-               :handler    h/schema}}]])
+               :handler    h/schema}}]
+
+   ["/reverse-schema"
+    {:swagger {:tags ["API"]}
+     :get     {:operationId "ReverseSchema"
+               :summary    "Fetches current reversed schema"
+               :parameters {:header ::db-header}
+               :middleware [middleware/token-auth middleware/auth]
+               :handler    h/reverse-schema}}]
+   ["/load-entities"
+    {:swagger {:tags ["API"]}
+     :post {:operationId "LoadEntities"
+            :summery "Load entities directly"
+            :parameters {:header ::db-header
+                         :body (st/spec {:spec ::imported-entities
+                                         :name "imported-entities"})}
+            :middleware [middleware/token-auth middleware/auth]
+            :handler h/load-entities}}]])
 
 (defn wrap-db-connection [handler]
   (fn [request]
@@ -235,26 +260,21 @@
       (handler request))))
 
 (def route-opts
-  (->
-    {;; :validate spec/validate ;; enable spec validation for route data
-    ;;:reitit.spec/wrap spell/closed ;; strict top-level validation
-    ;; :reitit.middleware/transform dev/print-request-diffs
-    :exception pretty/exception
-    :data      {:coercion   reitit.coercion.spec/coercion
-                :muuntaja   m/instance
-                :middleware [swagger/swagger-feature
-                              parameters/parameters-middleware
-                              muuntaja/format-negotiate-middleware
-                              muuntaja/format-response-middleware
-                              exception/exception-middleware
-                              muuntaja/format-request-middleware
-                              coercion/coerce-response-middleware
-                              coercion/coerce-request-middleware
-                              multipart/multipart-middleware]}}
-    (merge 
-      (if (-> config :server :dev-mode) 
-        {:reitit.middleware/transform dev/print-request-diffs} 
-        {}))))
+  {;; :reitit.middleware/transform dev/print-request-diffs ;; pretty diffs
+   ;; :validate spec/validate ;; enable spec validation for route data
+   ;;:reitit.spec/wrap spell/closed ;; strict top-level validation
+   :exception pretty/exception
+   :data      {:coercion   reitit.coercion.spec/coercion
+               :muuntaja   m/instance
+               :middleware [swagger/swagger-feature
+                            parameters/parameters-middleware
+                            muuntaja/format-negotiate-middleware
+                            muuntaja/format-response-middleware
+                            exception/exception-middleware
+                            muuntaja/format-request-middleware
+                            coercion/coerce-response-middleware
+                            coercion/coerce-request-middleware
+                            multipart/multipart-middleware]}})
 
 (def app
   (-> (ring/ring-handler
@@ -278,3 +298,4 @@
            (start-server config))
   :stop (server-stop! server))
 
+(comment)
