@@ -39,124 +39,63 @@
   (testing "Ping"
     (is (= "pew pew" (:body (client/request {:url "http://localhost:3333/ping" :method :get}))))))
 
-;; (deftest create-test
-;;   (testing "Get and create a databases"
-;;     (let [  a3 (:databases (api-request :post "/create-database"
-;;                               {:db tu/fb-root
-;;                                :name "testing",
-;;                                :keep-history? true
-;;                                :schema-flexibility :read}
-;;                               {:headers {:authorization "token neverusethisaspassword"}}))
-;;             a4 (try
-;;                 (api-request :post "/create-database"
-;;                               {:db tu/fb-root
-;;                               :name "testing"
-;;                               :keep-history? true
-;;                               :schema-flexibility :read}
-;;                               {:headers {:authorization "token neverusethisaspassword"}})
-;;                 (catch Exception _ "failed"))
-;;             a5 (tu/no-env (conj (db/scan-stores {:databases [{:store {:db tu/test-root}} {:store {:db tu/fb-root}}]}) db/memdb))
-;;             b1 (:url (api-request :post "/backup-database"
-;;                         {:db tu/fb-root
-;;                           :name "testing",
-;;                           :keep-history? true
-;;                           :schema-flexibility :read}
-;;                         {:headers {:authorization "token neverusethisaspassword"}}))
-;;             a6 (api-request :post "/transact"
-;;                         {:tx-data [{:foo 1}]}
-;;                         {:headers {:authorization "token neverusethisaspassword"
-;;                                    :db-name "testing"}})
-;;             a7 (api-request :post "/datoms"
-;;                                     {:index :aevt
-;;                                      :components [:foo]}
-;;                                     {:headers {:authorization "token neverusethisaspassword"
-;;                                                :db-name "testing"}})
-;;             _  (api-request :post "/transact"
-;;                         {:tx-data [{:foo 2 :bar 4}]}
-;;                         {:headers {:authorization "token neverusethisaspassword"
-;;                                    :db-name "testing"}})
-;;             b2 (:url (api-request :post "/backup-database"
-;;                         {:db tu/fb-root
-;;                           :name "testing",
-;;                           :keep-history? true
-;;                           :schema-flexibility :read}
-;;                         {:headers {:authorization "token neverusethisaspassword"}}))      
-;;             tx (-> a6 :tx-data first (nth 3))
-;;             a8 (api-request :post "/datoms"
-;;                                     {:index :aevt
-;;                                      :components [:foo]}
-;;                                     {:headers {:authorization "token neverusethisaspassword"
-;;                                                :db-name "testing"}})
-;;             a9 (api-request :post "/datoms"
-;;                                     {:index :aevt
-;;                                      :components [:foo]}
-;;                                     {:headers {:authorization "token neverusethisaspassword"
-;;                                                :db-name "testing"
-;;                                                :db-tx tx}})
-;;             _ (api-request :post "/restore-database"
-;;                           {:db tu/fb-root
-;;                            :name "testing",
-;;                            :keep-history? true
-;;                            :schema-flexibility :read
-;;                            :backup-url b1}
-;;                           {:headers {:authorization "token neverusethisaspassword"}})
-;;             a10 (api-request :post "/datoms"
-;;                                     {:index :aevt
-;;                                      :components [:foo]}
-;;                                     {:headers {:authorization "token neverusethisaspassword"
-;;                                                :db-name "testing"}})
-;;             _ (api-request :post "/restore-database"
-;;                           {:db tu/fb-root
-;;                            :name "testing",
-;;                            :keep-history? true
-;;                            :schema-flexibility :read
-;;                            :backup-url b2}
-;;                           {:headers {:authorization "token neverusethisaspassword"}})
-;;             a11 (api-request :post "/datoms"
-;;                                     {:index :aevt
-;;                                      :components [:foo]}
-;;                                     {:headers {:authorization "token neverusethisaspassword"
-;;                                                :db-name "testing"}})]
-;;       (is (= (sort-by :name a3) (sort-by :name a5)))
-;;       (is (= "failed" a4))
-;;       (is (< (count a7) (count a8)))
-;;       (is (= a7 a9))
-;;       (is (not= a7 a8))
-;;       (is (= 0 (count a10)))
-;;       (is (= 2 (count a11))))))
-
 (deftest databases-test
   (testing "Get Databases"
-    (is (= {:databases
-            [{:store {:root "sessions", 
-                      :backend :firebase, 
-                      :db tu/test-root}, 
-              :name "sessions", 
-              :keep-history? false, 
-              :index :datahike.index/hitchhiker-tree, 
-              :attribute-refs? false, 
-              :schema-flexibility :read, 
-              :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
-             {:store {:root "users", 
-                      :backend :firebase, 
-                      :db tu/test-root}, 
-              :keep-history? true, 
-              :index :datahike.index/hitchhiker-tree, 
-              :name "users", 
-              :attribute-refs? false, 
-              :schema-flexibility :write, 
-              :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
-             {:store {:id "default", :backend :mem}, 
-              :keep-history? false, 
-              :schema-flexibility :read, 
-              :name "default", 
-              :attribute-refs? false, 
-              :index :datahike.index/hitchhiker-tree, 
-              :cache-size 100000, 
-              :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}}]}
-           (api-request :get "/databases"
-                        nil
-                        {:headers {:authorization "token neverusethisaspassword"}})))))
+    (let [a1 (:databases (api-request :post "/create-database"
+                              {:db tu/fb-root
+                               :name "testing",
+                               :keep-history? true
+                               :schema-flexibility :read}
+                              {:headers {:authorization "token neverusethisaspassword"}}))
+          a2 (try
+                (api-request :post "/create-database"
+                              {:db tu/fb-root
+                              :name "testing"
+                              :keep-history? true
+                              :schema-flexibility :read}
+                              {:headers {:authorization "token neverusethisaspassword"}})
+                (catch Exception _ "failed"))]
+      (is (= "failed" a2))
+      (is (= {:databases
+              [{:store {:root "sessions", 
+                        :backend :firebase, 
+                        :db tu/test-root}, 
+                :name "sessions", 
+                :keep-history? false, 
+                :index :datahike.index/hitchhiker-tree, 
+                :attribute-refs? false, 
+                :schema-flexibility :read, 
+                :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
+              {:store {:root "users", 
+                        :backend :firebase, 
+                        :db tu/test-root}, 
+                :keep-history? true, 
+                :index :datahike.index/hitchhiker-tree, 
+                :name "users", 
+                :attribute-refs? false, 
+                :schema-flexibility :write, 
+                :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
+              { :store {:id "default", :backend :mem}, 
+                :keep-history? false, 
+                :schema-flexibility :read, 
+                :name "default", 
+                :attribute-refs? false, 
+                :index :datahike.index/hitchhiker-tree, 
+                :cache-size 100000, 
+                :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}}
+              { :store {:backend :firebase,
+                         :db "https://alekcz-dev.firebaseio.com/firetomic-test",
+                         :root "testing"}
+                :attribute-refs? false,
+                :cache-size 100000,
+                :index :datahike.index/hitchhiker-tree,
+                :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283},
+                :keep-history? true,
+                :name "testing",
+                :schema-flexibility :read}]}
+            (api-request :get "/databases"
+                          nil
+                          {:headers {:authorization "token neverusethisaspassword"}}))))))
 
 (deftest transact-test
   (testing "Transact values"
@@ -305,3 +244,41 @@
                      :token :neverusethisaspassword}}
            (dc/load-config-file "test/datahike_server/resources/config.edn")))))
 
+(deftest backup-restore-test
+  (testing "Backup data base to firebase and restore it."
+    (add-test-data)
+    (let [url (-> 
+                (api-request :post "/backup-database"
+                              {:backup-name "bakky"}
+                              {:headers {:authorization "token neverusethisaspassword"
+                                         :db-name "sessions"}})
+                :backup-url)
+          _  (api-request :post "/transact"
+                          {:tx-data [{:name "Alicia" :age 22} {:name "Bobatea" :age 23}]}
+                          {:headers {:authorization "token neverusethisaspassword"
+                                      :db-name "sessions"}})      
+          d1 (-> 
+                (api-request :post "/datoms"
+                              {:index :aevt
+                              :components [:age]}
+                              {:headers {:authorization "token neverusethisaspassword"
+                                        :db-name "sessions"}})
+                count)
+          _ (api-request :post "/restore-database"
+                    { :db tu/test-root
+                      :name "sessions"
+                      :schema-flexibility :read
+                      :keep-history? false
+                      :backup-url url}
+                    {:headers {:authorization "token neverusethisaspassword"
+                                :db-name "sessions"}})  
+          d2 (-> 
+                (api-request :post "/datoms"
+                              {:index :aevt
+                              :components [:age]}
+                              {:headers {:authorization "token neverusethisaspassword"
+                                        :db-name "sessions"}})
+                count)]  
+      (println url)                       
+      (is (= 4 d1))                
+      (is (= 2 d2)))))

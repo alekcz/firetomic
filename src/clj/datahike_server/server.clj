@@ -113,7 +113,7 @@
     {:swagger {:tags ["API"]}
      :post    {:operationId "BackupDatabase"
                :summary "Backup a firetomic database"
-               :parameters {:body   (st/spec {:spec ::database
+               :parameters {:body   (st/spec {:spec ::params
                                               :name "backup"})}
                :middleware [middleware/token-auth middleware/auth]
                :handler    h/backup-database}}]

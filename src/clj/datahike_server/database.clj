@@ -89,31 +89,23 @@
         (mount/swap {#'datahike-server.database/conns new-conns})
         (mount/start)))))
 
-(defn backup-database [{:keys [db name keep-history? schema-flexibility]}]
-  (let [cfg { :store {:backend :firebase 
-                      :db db
-                      :root name
-                      :env "FIRETOMIC_FIREBASE_AUTH"}
-              :name name
-              :keep-history? keep-history?
-              :schema-flexibility schema-flexibility}
-        auth (auth/create-token "FIRETOMIC_FIREBASE_AUTH")
-        name (-> cfg :store :db (str/replace "https://" "") (str/replace "http://" "") (str/replace "." "-") (str/replace "/" "-"))
+(defn backup-database [name conn]
+  (let [auth (auth/create-token "FIRETOMIC_FIREBASE_AUTH")
         date (new java.util.Date)
         day (.format (java.text.SimpleDateFormat. "YYYY-MM-dd") date)
         full-date (.format (java.text.SimpleDateFormat. "YYYY-MM-dd-HH-mm-ss") date)
         final-name (str "backups/" name "/" day "/" name "-" full-date ".backup.edn")
         temp (str "temp/" final-name)]
-    (when (d/database-exists? cfg)
-      (let [connection (d/connect cfg)]
-        (log/infof (str "Backing up database to " final-name "..."))
-        (io/make-parents temp)
-        (export-db connection temp)  
-        (storage/upload! final-name temp "application/edn" auth)
-        (log/infof "Done")
-        final-name))))
+    (when conn
+      (log/infof (str "Backing up database to " final-name "..."))
+      (io/make-parents temp)
+      (export-db conn temp)  
+      (storage/upload! final-name temp "application/edn" auth)
+      (log/infof "Done")
+      final-name)))
 
-(defn restore-database [{:keys [db name keep-history? schema-flexibility backup-url]}]
+(defn restore-database [{:keys [db name keep-history? schema-flexibility backup-url] :as params}]
+  (log/infof (str "\n\n\n" params "\n\n\n"))
   (let [cfg { :store {:backend :firebase 
                       :db db
                       :root name

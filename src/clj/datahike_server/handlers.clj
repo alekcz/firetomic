@@ -97,16 +97,18 @@
                        :message (.getMessage e)}
                        (list-databases-helper))))))
 
-(defn backup-database [{{:keys [body]} :parameters}]
-  (println body)
-  (success {:url (db/backup-database body)}))
-  
-(defn restore-database [{{:keys [body]} :parameters}]
+(defn backup-database [{{:keys [body]} :parameters conn :conn db :db}]
   (try
-    (success {:url (db/restore-database body)})
+    (let [db (or db @conn)]
+      (success {:backup-url (db/backup-database (:backup-name body) conn)}))
     (catch Exception e
-      (invalid {:error true
-                :message (.getMessage e)}))))
-
+        (.printStackTrace e)
+        (invalid (merge {:error true
+                        :message (.getMessage e)}
+                        (list-databases-helper))))))
+  
+(defn restore-database [{{:keys [body]} :parameters _conn :conn _db :db}]
+  (success {:backup-url (db/restore-database body)}))
+  
 (defn delete-database [{{:keys [body]} :parameters}]
   (success {:url (db/delete-database body)}))       
