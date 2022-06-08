@@ -2,7 +2,7 @@
   (:require [clojure.test :refer [deftest testing is]]
             [datahike-server.database :refer [cleanup-databases]]
             [datahike-server.config :as config]
-            [datahike-server.test-utils :refer [api-request]]
+            [datahike-server.test-utils :refer [api-request] :as utils]
             [mount.core :as mount]))
 
 (deftest dev-mode-test
@@ -10,25 +10,25 @@
                                                              :stop (fn [] {})}})
   (cleanup-databases)
   (is (= {:databases
-          [{:store {:backend :firebase 
-                      :db "http://localhost:9000/prod" 
-                      :root "sessions"}:keep-history? false,
-            :schema-flexibility :read,
-            :name "sessions",
-            :index :datahike.index/hitchhiker-tree
-            :attribute-refs? false,
-            :cache-size 100000,
-            :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}
-           {:store {:backend :firebase 
-                      :db "http://localhost:9000/prod" 
-                      :root "users"}
-              :keep-history? true,
-            :schema-flexibility :write,
-            :name "users",
-            :index :datahike.index/hitchhiker-tree
-            :attribute-refs? false,
-            :cache-size 100000,
-            :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}}]}
+           [{:keep-history? true, 
+              :index :datahike.index/hitchhiker-tree, 
+              :store {:root "users", :backend :firebase, :db utils/dev-root}, 
+              :name "users", 
+              :attribute-refs? false, 
+              :schema-flexibility :write, 
+              :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
+             {:keep-history? false, 
+              :index :datahike.index/hitchhiker-tree, 
+              :store {:root "sessions", :backend :firebase, :db utils/dev-root}, 
+              :initial-tx [{:name "Alice", :age 20} {:name "Bob", :age 21}], 
+              :name "sessions", 
+              :attribute-refs? false, 
+              :schema-flexibility :read, 
+              :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
+             {:store {:id "default", :backend :mem}, 
+              :keep-history? false, :schema-flexibility :read, :name "default", :attribute-refs? false, 
+              :index :datahike.index/hitchhiker-tree, :cache-size 100000, 
+              :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}}]}
          (api-request :get "/databases"
                       nil
                       {})))

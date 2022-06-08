@@ -7,6 +7,7 @@
             [fire.auth :as auth]))
 
 (def test-root "http://localhost:9000/prod")
+(def dev-root "http://localhost:9000/dev")
 (def fb-root "https://alekcz-dev.firebaseio.com/firetomic-test")
 
 (defn parse-body [{:keys [body]}]
@@ -22,6 +23,7 @@
   ([method url data opts]
    (-> (client/request (merge {:url (str "http://localhost:3333" url)
                                :method method
+                               :throw-exceptions? false
                                :content-type "application/edn"
                                :accept "application/edn"}
                               (when (or (= method :post) data)
