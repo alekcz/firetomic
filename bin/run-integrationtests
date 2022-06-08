@@ -10,7 +10,7 @@ function setup() {
 
 function test_auth() {
     cp -av test/datahike_server/resources/config.edn resources/config.edn
-    ./bin/kaocha --focus datahike-server.integration-test
+    ./bin/kaocha --focus datahike-server.integration-test --plugin cloverage --codecov
 }
 function test_middleware() {
     cp -av test/datahike_server/resources/config.edn resources/config.edn
