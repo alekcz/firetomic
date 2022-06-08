@@ -1,10 +1,9 @@
 (ns ^:integration datahike-server.integration-test
   (:require [clojure.test :refer [deftest is testing use-fixtures]]
             [datahike-server.install :as is]
-            [datahike-server.database :as db]       
             [datahike-server.config :as dc]
             [clj-http.client :as client]     
-            [datahike-server.test-utils :refer [api-request setup-db] :as tu]))
+            [datahike-server.test-utils :refer [api-request setup-db] :as utils]))
 
 (defn add-test-data []
   (api-request :post "/transact"
@@ -16,6 +15,7 @@
   (api-request :post "/transact"
                {:tx-data [{:db/ident :name
                            :db/valueType :db.type/string
+                           :db/unique :db.unique/identity
                            :db/cardinality :db.cardinality/one}]}
                {:headers {:authorization "token neverusethisaspassword"
                           :db-name "users"}}))
@@ -42,24 +42,24 @@
 (deftest databases-test
   (testing "Get Databases"
     (let [a1 (:databases (api-request :post "/create-database"
-                              {:db tu/fb-root
+                              {:db utils/fb-root
                                :name "testing",
                                :keep-history? true
                                :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}}))
           a2 (try
                 (api-request :post "/create-database"
-                              {:db tu/fb-root
+                              {:db utils/fb-root
                               :name "testing"
                               :keep-history? true
                               :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}})
                 (catch Exception _ "failed"))]
-      (is (= "failed" a2))
+      (is (true? (:error a2)))
       (is (= {:databases
               [{:store {:root "sessions", 
                         :backend :firebase, 
-                        :db tu/test-root}, 
+                        :db utils/test-root}, 
                 :name "sessions", 
                 :keep-history? false, 
                 :index :datahike.index/hitchhiker-tree, 
@@ -68,7 +68,7 @@
                 :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
               {:store {:root "users", 
                         :backend :firebase, 
-                        :db tu/test-root}, 
+                        :db utils/test-root}, 
                 :keep-history? true, 
                 :index :datahike.index/hitchhiker-tree, 
                 :name "users", 
@@ -98,12 +98,16 @@
                           {:headers {:authorization "token neverusethisaspassword"}}))))))
 
 (deftest transact-test
-  (testing "Transact values"
-    (is (= {:tx-data [[1 :foo 1 536870913 true]], :tempids #:db{:current-tx 536870913}, :tx-meta []}
-           (api-request :post "/transact"
-                        {:tx-data [{:foo 1}]}
-                        {:headers {:authorization "token neverusethisaspassword"
-                                   :db-name "sessions"}})))))
+  (let [transact-request (partial api-request :post "/transact")
+        body {:tx-data [{:foo 1}]}
+        params {:headers {:authorization "token neverusethisaspassword"
+                          :db-name "sessions"}}]
+    (testing "Transact values on database without schema"
+      (is (= {:tx-data [[1 :foo 1 536870913 true]], :tempids #:db{:current-tx 536870913}, :tx-meta []}
+             (transact-request body params))))
+    (testing "Transact values on database with schema"
+      (is (= {:message "Bad entity attribute :foo at {:db/id 1, :foo 1}, not defined in current schema"}
+             (transact-request body (assoc-in params [:headers :db-name] "users")))))))
 
 (deftest db-test
   (testing "Get current database as a hash"
@@ -189,6 +193,7 @@
     (add-test-schema)
     (is (= {:name #:db{:ident       :name,
                        :valueType   :db.type/string,
+                       :unique  :db.unique/identity
                        :cardinality :db.cardinality/one,
                        :id          1}}
            (api-request :get "/schema"
@@ -199,7 +204,10 @@
 (deftest reverse-schema-test
   (testing "Fetches current reverse schema"
     (add-test-schema)
-    (is (= {:db/ident #{:name}}
+    (is (= {:db/ident #{:name}
+            :db/unique #{:name}
+            :db.unique/identity #{:name}
+            :db/index #{:name}}
            (api-request :get "/reverse-schema"
                         {}
                         {:headers {:authorization "token neverusethisaspassword"
@@ -265,7 +273,7 @@
                                         :db-name "sessions"}})
                 count)
           _ (api-request :post "/restore-database"
-                    { :db tu/test-root
+                    { :db utils/test-root
                       :name "sessions"
                       :schema-flexibility :read
                       :keep-history? false
@@ -282,3 +290,110 @@
       (println url)                       
       (is (= 4 d1))                
       (is (= 2 d2)))))
+(deftest history-test
+  (testing "History with removed entries"
+    (add-test-schema)
+    (api-request :post "/transact"
+                 {:tx-data [{:name "Alice"} {:name "Bob"}]}
+                 {:headers {:authorization "token neverusethisaspassword"
+                            :db-name "users"}})
+    (api-request :post "/transact"
+                 {:tx-data [[:db/retractEntity [:name "Alice"]]]}
+                 {:headers {:authorization "token neverusethisaspassword"
+                            :db-name       "users"}})
+    (is (= #{[2 "Alice" false] [2 "Alice" true]}
+           (set (api-request :post "/q"
+                             {:query '[:find ?e ?n ?s :in $ ?n :where [?e :name ?n _ ?s]]
+                              :args ["Alice"]}
+                             {:headers {:authorization "token neverusethisaspassword"
+                                        :db-name       "users"
+                                        :db-history-type "history"}})))))
+  (testing "History on non-temporal database"
+    (is (= {:message "history is only allowed on temporal indexed databases."}
+           (api-request :post "/q"
+                        {:query '[:find ?e ?x ?s
+                                  :where [?e :foo ?x _ ?s]]}
+                        {:headers {:authorization "token neverusethisaspassword"
+                                   :db-name       "sessions"
+                                   :db-history-type "history"}})))))
+
+(deftest as-of-test
+  (testing "As-of with removed entries"
+    (add-test-schema)
+    (api-request :post "/transact"
+                 {:tx-data [{:name "Alice"} {:name "Bob"}]}
+                 {:headers {:authorization "token neverusethisaspassword"
+                            :db-name "users"}})
+    (api-request :post "/transact"
+                 {:tx-data [[:db/retractEntity [:name "Alice"]]]}
+                 {:headers {:authorization "token neverusethisaspassword"
+                            :db-name       "users"}})
+    (let [tx-id (->> (api-request :post "/q"
+                                  {:query '[:find ?t :where [?t :db/txInstant _ ?t]]}
+                                  {:headers {:authorization "token neverusethisaspassword"
+                                             :db-name       "users"}})
+                     second
+                     first)]
+      (is (= #{[2 "Alice"]}
+             (set (api-request :post "/q"
+                               {:query '[:find ?e ?n :in $ ?n :where [?e :name ?n]]
+                                :args ["Alice"]}
+                               {:headers {:authorization "token neverusethisaspassword"
+                                          :db-name       "users"
+                                          :db-timepoint tx-id
+                                          :db-history-type "as-of"}}))))
+      (is (= []
+             (api-request :post "/q"
+                          {:query '[:find ?e ?n :in $ ?n :where [?e :name ?n]]
+                           :args ["Alice"]}
+                          {:headers {:authorization "token neverusethisaspassword"
+                                     :db-name       "users"}})))))
+  (testing "As-of on non-temporal database"
+    (is (= {:message "as-of is only allowed on temporal indexed databases."}
+           (api-request :post "/q"
+                        {:query '[:find ?e ?x ?s
+                                  :where [?e :foo ?x _ ?s]]}
+                        {:headers {:authorization "token neverusethisaspassword"
+                                   :db-name       "sessions"
+                                   :db-history-type "as-of"
+                                   :db-timepoint 1}})))))
+(deftest since-test
+  (testing "Since with removed and new entries"
+    (add-test-schema)
+    (api-request :post "/transact"
+                 {:tx-data [{:name "Alice"} {:name "Bob"}]}
+                 {:headers {:authorization "token neverusethisaspassword"
+                            :db-name "users"}})
+    (api-request :post "/transact"
+                 {:tx-data [{:name "Charlie"}]}
+                 {:headers {:authorization "token neverusethisaspassword"
+                            :db-name       "users"}})
+    (let [tx-id (->> (api-request :post "/q"
+                                  {:query '[:find ?t :where [?t :db/txInstant _ ?t]]}
+                                  {:headers {:authorization "token neverusethisaspassword"
+                                             :db-name       "users"}})
+                     last
+                     first)]
+      (is (= #{["Charlie"]}
+             (set (api-request :post "/q"
+                               {:query '[:find ?n :in $ ?n :where [?e :name ?n]]
+                                :args []}
+                               {:headers {:authorization "token neverusethisaspassword"
+                                          :db-name       "users"
+                                          :db-timepoint tx-id
+                                          :db-history-type "since"}}))))
+      (is (= #{["Alice"] ["Bob"] ["Charlie"]}
+             (set (api-request :post "/q"
+                               {:query '[:find ?n :in $ ?n :where [?e :name ?n]]
+                                :args []}
+                               {:headers {:authorization "token neverusethisaspassword"
+                                          :db-name       "users"}}))))))
+  (testing "Since on non-temporal database"
+    (is (= {:message "since is only allowed on temporal indexed databases."}
+           (api-request :post "/q"
+                        {:query '[:find ?e ?x ?s
+                                  :where [?e :foo ?x _ ?s]]}
+                        {:headers {:authorization "token neverusethisaspassword"
+                                   :db-name       "sessions"
+                                   :db-history-type "since"
+                                   :db-timepoint 1}})))))

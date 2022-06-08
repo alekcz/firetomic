@@ -1,7 +1,6 @@
 (ns datahike-server.handlers
   (:require [datahike-server.database :refer [conns] :as db]
             [datahike.api :as d]
-            [datahike.db :as dd]
             [datahike-firebase.core]
             [datahike.core :as c]))
 
@@ -24,7 +23,7 @@
 (defn list-databases [_]
   (success (list-databases-helper)))
 
-(defn get-db [{:keys [conn]}]
+(defn get-db-hash [{:keys [conn]}]
   (success {:hash (hash @conn)}))
 
 (defn cleanup-result [result]
@@ -99,8 +98,7 @@
 
 (defn backup-database [{{:keys [body]} :parameters conn :conn db :db}]
   (try
-    (let [db (or db @conn)]
-      (success {:backup-url (db/backup-database (:backup-name body) conn)}))
+    (success {:backup-url (db/backup-database (:backup-name body) conn)})
     (catch Exception e
         (.printStackTrace e)
         (invalid (merge {:error true

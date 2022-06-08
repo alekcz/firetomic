@@ -30,8 +30,10 @@ datahike-server.iml
 
 /.store
 resources/config.edn
-.clj-kondo/.cache/
+.clj-kondo
 .dir-locals.el
 .cpcache/
 
 /temp
+.lsp
+.calva

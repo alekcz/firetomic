@@ -147,3 +147,9 @@
       (d/delete-database cfg))
     (log/infof "Done"))
   (start #'datahike-server.database/conns))
+
+(defn get-db [db-name]
+  (if-let [conn (get conns db-name)]
+    conn
+    (throw (ex-info (format "Database %s does not exist." db-name)
+                    {:cause :db-does-not-exist}))))
