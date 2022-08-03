@@ -84,7 +84,7 @@ overwrites the values from environment and properties.
 envvar                    | default
 --------------------------|-------------
 FIRETOMIC_PORT            | 4000
-FIRETOMIC_LOGLEVEL        | warn
+FIRETOMIC_LOG_LEVEL        | warn
 FIRETOMIC_DEV_MODE        | false
 FIRETOMIC_TOKEN           | --
 FIRETOMIC_NAME            | --

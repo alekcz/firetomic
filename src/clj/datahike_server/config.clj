@@ -40,7 +40,7 @@
         _ (println token)
         server-config (merge
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
-                        :loglevel (keyword (:firetomic-loglevel env :debug))
+                        :loglevel (keyword (:firetomic-log-level env :warn))
                         :token token
                         :dev-mode (bool-from-env :firetomic-dev-mode false)}
                        (:server config-from-file))
@@ -48,7 +48,7 @@
                                   server-config
                                   (throw (ex-info "Server configuration error:" (s/explain-data ::server-config server-config))))
         firetomic-config  {:store { :backend :firebase 
-                                    :db (or (env :firetomic-db) "http://localhost:9000")
+                                    :db (or (env :firetomic-firebase-url) "http://localhost:9000")
                                     :root (env :firetomic-name)
                                     :env "FIRETOMIC_FIREBASE_AUTH"}
                             :name (env :firetomic-name)
