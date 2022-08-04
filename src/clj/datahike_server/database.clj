@@ -22,36 +22,51 @@
             :index :datahike.index/hitchhiker-tree,
             :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}})
 
-(defn scan-stores [{:keys [databases]}]
-  (let [dbs (into [] (set (map #(-> % :store :db) databases)))
-        auth (auth/create-token "FIRETOMIC_FIREBASE_AUTH")
-        new (for [d (filter some? dbs)]
-              (let [names (keys (fire/read d "/" auth {:query {:shallow true}}))]
+(defn scan-stores [cfg]
+  (let [server (:server cfg)
+        auth-env (:auth-env server)
+        auth  (auth/create-token auth-env)
+        fb-url (:firebase-url server)
+        new   (let [names (keys (fire/read fb-url "/" auth {:query {:shallow true}}))]
                 (for [n names]
-                  (let [store {:store {:backend :firebase :db d :root (name n) :env "FIRETOMIC_FIREBASE_AUTH"}}]
+                  (let [store {:store {:backend :firebase :db fb-url :root (name n) :env auth-env}}]
                     (when (d/database-exists? store)
                       (let [c (.-config @(d/connect store))]
-                        (assoc-in c [:store :env] "FIRETOMIC_FIREBASE_AUTH")))))))]                        
-    (filter some? (flatten new))))
+                        c)))))]                        
+    (filter some? new)))
 
-(defn init-connections [{:keys [databases]}]
+(defn prepare-databases [{:keys [server databases] :as configuration}]
+  (assoc configuration
+    :databases
+    (for [cfg databases]
+      (let [auth-env (:auth-env server)
+            fb-url (:firebase-url server)]
+        (if (or (-> cfg :store :backend (= :mem))
+                (str/starts-with? (-> cfg :store :db str) "http://")
+                (str/starts-with? (-> cfg :store :db str) "https://"))
+            cfg 
+            (assoc cfg :store {:backend :firebase :db fb-url :root  (-> cfg :name) :env auth-env}))))))
+
+(defn init-connections [{:keys [ databases]}]
   (when-not (nil? databases)
-    (reduce
-     (fn [acc {:keys [name] :as cfg}]
-       (when-not (d/database-exists? cfg)
-         (log/infof "Creating database...")
-         (d/create-database cfg)
-         (log/infof "Done"))
-       (let [conn (d/connect cfg)]
-         (assoc acc (-> @conn :config :name) conn)))
-     {}
-     databases)))
+    (let [conns (reduce
+                  (fn [coni cfg]
+                    (if (d/database-exists? cfg)
+                      (assoc coni (-> cfg :name) (d/connect cfg))
+                      (do 
+                        (log/infof "Creating database...")
+                        (d/create-database cfg)
+                        (assoc coni (-> cfg :name) (d/connect cfg)))))
+                  {}
+                  databases)]
+      conns)))
 
 (defstate conns
   :start (let [existing (scan-stores config)
                final-dbs (into [] (set (concat existing (:databases config))))
-               final-config (assoc config :databases (conj final-dbs memdb))]
-           (log/debug "Connecting to databases with config: " (str final-config))
+               full-config (assoc config :databases (conj final-dbs memdb))
+               final-config (prepare-databases full-config)]
+           (log/debug (str "Connecting to databases with config:\n" final-config "\n"))
            (init-connections final-config))
   :stop (for [conn (vals conns)]
           (d/release conn)))
@@ -64,11 +79,11 @@
     (log/infof (str "Restoring database from " backup-url "..."))
     (import-db conn temp)))
 
-(defn add-database [{:keys [db name keep-history? schema-flexibility backup-url]}]
+(defn add-database [{:keys [name keep-history? schema-flexibility backup-url]}]
   (let [cfg { :store {:backend :firebase 
-                      :db db
+                      :db (-> config :server :firebase-url)
                       :root name
-                      :env "FIRETOMIC_FIREBASE_AUTH"}
+                      :env (-> config :server :auth-env)}
               :name name
               :keep-history? keep-history?
               :schema-flexibility schema-flexibility}]
@@ -104,12 +119,11 @@
       (log/infof "Done")
       final-name)))
 
-(defn restore-database [{:keys [db name keep-history? schema-flexibility backup-url] :as params}]
-  (log/infof (str "\n\n\n" params "\n\n\n"))
+(defn restore-database [{:keys [name keep-history? schema-flexibility backup-url] :as params}]
   (let [cfg { :store {:backend :firebase 
-                      :db db
+                      :db (-> config :server :firebase-url)
                       :root name
-                      :env "FIRETOMIC_FIREBASE_AUTH"}
+                      :env (-> config :server :auth-env)}
               :name name
               :keep-history? keep-history?
               :schema-flexibility schema-flexibility}]

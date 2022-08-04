@@ -12,14 +12,14 @@
   (is (= {:databases
            [{:keep-history? true, 
               :index :datahike.index/hitchhiker-tree, 
-              :store {:root "users", :backend :firebase, :db utils/dev-root}, 
+              :store {:root "users", :backend :firebase, :db utils/fb-url}, 
               :name "users", 
               :attribute-refs? false, 
               :schema-flexibility :write, 
               :index-config {:index-b-factor 17, :index-log-size 283, :index-data-node-size 300}, :cache-size 100000} 
              {:keep-history? false, 
               :index :datahike.index/hitchhiker-tree, 
-              :store {:root "sessions", :backend :firebase, :db utils/dev-root}, 
+              :store {:root "sessions", :backend :firebase, :db utils/fb-url}, 
               :initial-tx [{:name "Alice", :age 20} {:name "Bob", :age 21}], 
               :name "sessions", 
               :attribute-refs? false, 

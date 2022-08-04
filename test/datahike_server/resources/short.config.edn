@@ -1,6 +1,4 @@
-{:databases [{:initial-tx [{:name "Alice", :age 20}
-                           {:name "Bob", :age 21}]
-              :schema-flexibility :read
+{:databases [{:schema-flexibility :read
               :keep-history? false
               :name "sessions"}
              {:name "users"
@@ -10,4 +8,4 @@
           :join? false
           :loglevel :warn
           :firebase-url "http://localhost:9000"
-          :dev-mode true}}
+          :token :neverusethisaspassword}}

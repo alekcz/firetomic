@@ -2,13 +2,9 @@
   (:require [clojure.edn :as edn]
             [datahike-server.database :refer [cleanup-databases]]
             [datahike-server.core :refer [start-all stop-all]]
-            [clj-http.client :as client]
-            [fire.core :as fire]
-            [fire.auth :as auth]))
+            [clj-http.client :as client]))
 
-(def test-root "http://localhost:9000/prod")
-(def dev-root "http://localhost:9000/dev")
-(def fb-root "https://alekcz-dev.firebaseio.com/firetomic-test")
+(def fb-url "http://localhost:9000")
 
 (defn parse-body [{:keys [body]}]
   (if-not (empty? body)
@@ -33,15 +29,19 @@
 
 (defn setup-db [f]
   (start-all)
-  (cleanup-databases)
   (api-request :post "/delete-database"
-                  {:db fb-root
-                   :name "testing"
+                  {:name "testing"
                    :keep-history? true
                    :schema-flexibility :read}
                   {:headers {:authorization "token neverusethisaspassword"}})
+  (cleanup-databases)
   (f)
-  (fire/delete! "https://alekcz-dev.firebaseio.com" "/firetomic-test/" (auth/create-token "FIRETOMIC_FIREBASE_AUTH"))
+  (api-request :post "/delete-database"
+                  {:name "testing"
+                   :keep-history? true
+                   :schema-flexibility :read}
+                  {:headers {:authorization "token neverusethisaspassword"}})
+  (cleanup-databases)
   (stop-all))
 
 (defn no-env [xs]

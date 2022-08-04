@@ -19,7 +19,6 @@
             [ring.middleware.cors :refer [wrap-cors]]
             [muuntaja.core :as m]
             [clojure.spec.alpha :as s]
-            [cemerick.url :as url]
             [taoensso.timbre :as log]
             [mount.core :refer [defstate]]
             [spec-tools.core :as st]
@@ -68,16 +67,15 @@
                            :opt-un [::db-tx]))
 (s/def ::params map?)
 
-(s/def ::db (s/and string? #(try (url/url %) (catch Throwable _ false))))
 (s/def ::backup-url string?)
 
 (s/def ::name string?)
 (s/def ::keep-history? boolean?)
 (s/def ::schema-flexibility keyword?)
 
-(s/def ::database (s/keys :req-un [::db ::name ::keep-history? ::schema-flexibility]))
+(s/def ::database (s/keys :req-un [::name ::keep-history? ::schema-flexibility]))
 
-(s/def ::restorable-database (s/keys :req-un [::db ::name ::keep-history? ::schema-flexibility ::backup-url]))
+(s/def ::restorable-database (s/keys :req-un [::name ::keep-history? ::schema-flexibility ::backup-url]))
 (s/def :entity/vector (s/cat :e long? :a keyword? :v any? :t long? :added boolean?))
 (s/def ::entities (s/coll-of :entity/vector))
 (s/def ::imported-entities (s/keys :req-un [::entities]))

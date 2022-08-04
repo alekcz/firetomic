@@ -19,10 +19,12 @@
 (s/def ::set-token keyword?)
 (s/def ::nil-token nil?)
 (s/def ::token (s/or :s keyword? :n nil?))
+(s/def ::auth-env (s/or :s string? :n nil?))
+(s/def ::firebase-url (s/or :s string? :n nil?))
 
 (s/def ::dev-mode boolean?)
-(s/def ::server-config (s/keys :req-un [::port ::loglevel]
-                               :opt-un [::dev-mode ::token]))
+(s/def ::server-config (s/keys :req-un [::port ::loglevel ::firebase-url]
+                               :opt-un [::dev-mode ::token ::auth-env]))
 
 (defn load-config-file [config-file]
   (try
@@ -37,28 +39,20 @@
   [config-file]
   (let [config-from-file (load-config-file config-file)
         token (keyword (:firetomic-token env nil))
-        _ (println token)
         server-config (merge
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000)) 
                         :loglevel (keyword (:firetomic-log-level env :warn))
                         :token token
-                        :dev-mode (bool-from-env :firetomic-dev-mode false)}
+                        :dev-mode (bool-from-env :firetomic-dev-mode false)
+                        :firebase-url (:firetomic-firebase-url env "http://localhost:9000")
+                        :auth-env "FIRETOMIC_FIREBASE_AUTH"}
                        (:server config-from-file))
         validated-server-config (if (s/valid? ::server-config server-config)
                                   server-config
                                   (throw (ex-info "Server configuration error:" (s/explain-data ::server-config server-config))))
-        firetomic-config  {:store { :backend :firebase 
-                                    :db (or (env :firetomic-firebase-url) "http://localhost:9000")
-                                    :root (env :firetomic-name)
-                                    :env "FIRETOMIC_FIREBASE_AUTH"}
-                            :name (env :firetomic-name)
-                            :keep-history? (bool-from-env :firetomic-keep-history false) 
-                            :schema-flexibility (or (keyword (env :firetomic-schema-flexibility)) 
-                                                    :read)}
-                                                         
-        firetomic-configs (or (:databases config-from-file) [firetomic-config])]
+        databases (:databases config-from-file)]
     {:server validated-server-config
-     :databases firetomic-configs}))
+     :databases databases}))
 
 (defstate config
   :start (do

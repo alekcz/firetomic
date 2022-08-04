@@ -57,11 +57,7 @@ current directory. This file has a number of options and overwrites all other
 configuration given via environment or properties. Below you can find an example
 to configure both Datahike and the server.
 ```
-{:databases [{:store {:backend :firebase 
-                      :db "https://project-id.firebaseio.com" 
-                      :root "users"
-                      :env "FIRETOMIC_FIREBASE_AUTH"}
-              :name "users"
+{:databases [{:name "users"
               :keep-history? true
               :schema-flexibility :write}]
  :server {:port 3000
@@ -84,7 +80,7 @@ overwrites the values from environment and properties.
 envvar                    | default
 --------------------------|-------------
 FIRETOMIC_PORT            | 4000
-FIRETOMIC_LOG_LEVEL        | warn
+FIRETOMIC_LOG_LEVEL       | warn
 FIRETOMIC_DEV_MODE        | false
 FIRETOMIC_TOKEN           | --
 FIRETOMIC_NAME            | --

@@ -13,7 +13,7 @@ function test_auth() {
     ./bin/kaocha --focus datahike-server.integration-test --plugin cloverage --codecov
 }
 function test_middleware() {
-    cp -av test/datahike_server/resources/config.edn resources/config.edn
+    cp -av test/datahike_server/resources/short.config.edn resources/config.edn
     ./bin/kaocha --focus datahike-server.middleware-test
 }
 function test_dev_mode() {

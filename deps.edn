@@ -1,5 +1,5 @@
 { :name 'alekcz/firetomic
-  :version "0.4.1490-a.1"
+  :version "0.4.1490-a.2"
   :description "Firetomic: Datahike Server with Firebase as the backend"
   :url "https://github.com/alekcz/firetomic"
   :license {:name "EPL-2.0 License"

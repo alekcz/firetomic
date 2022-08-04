@@ -1,16 +1,71 @@
-{:databases [{:store {:backend :firebase 
-                      :db "http://localhost:9000/prod" 
-                      :root "sessions"}
-              :schema-flexibility :read
+{:databases [{:schema-flexibility :write
+              :keep-history? true
+              :name "users1"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users2"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users3"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users4"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users5"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users6"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions1"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions2"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions3"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions4"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions5"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions6"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions7"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions8"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions9"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions10"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions11"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions12"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions13"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions14"}
+             {:schema-flexibility :read
               :keep-history? false
               :name "sessions"}
-             {:store {:backend :firebase 
-                      :db "http://localhost:9000/prod" 
-                      :root "users"}
-              :name "users"
+             {:name "users"
               :keep-history? true
               :schema-flexibility :write}]
  :server {:port  3333
           :join? false
-          :loglevel :debug
+          :loglevel :warn
+          :firebase-url "http://localhost:9000"
           :token :neverusethisaspassword}}
