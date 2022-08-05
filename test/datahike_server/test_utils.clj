@@ -1,7 +1,7 @@
 (ns datahike-server.test-utils
   (:require [clojure.edn :as edn]
             [datahike-server.database :refer [cleanup-databases]]
-            [datahike-server.core :refer [start-all stop-all]]
+            [datahike-server.core :refer [start-all stop-all -main]]
             [clj-http.client :as client]))
 
 (def fb-url "http://localhost:9000")
@@ -28,19 +28,11 @@
        parse-body)))
 
 (defn setup-db [f]
+  (-main)
+  (stop-all)
   (start-all)
-  (api-request :post "/delete-database"
-                  {:name "testing"
-                   :keep-history? true
-                   :schema-flexibility :read}
-                  {:headers {:authorization "token neverusethisaspassword"}})
   (cleanup-databases)
   (f)
-  (api-request :post "/delete-database"
-                  {:name "testing"
-                   :keep-history? true
-                   :schema-flexibility :read}
-                  {:headers {:authorization "token neverusethisaspassword"}})
   (cleanup-databases)
   (stop-all))
 

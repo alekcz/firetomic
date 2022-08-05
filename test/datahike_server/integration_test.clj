@@ -52,7 +52,9 @@
                                :keep-history? true
                                :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}})
-                (catch Exception _ "failed"))]
+                (catch Exception _ "failed"))
+          dbs (:databases (api-request :get "/databases" nil {}))]
+      (is (= 24 (count dbs)))
       (is (true? (:error a2))))))      
 
 (deftest transact-test

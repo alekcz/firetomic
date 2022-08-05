@@ -1,6 +1,64 @@
-{:databases [{:initial-tx [{:name "Alice", :age 20}
-                           {:name "Bob", :age 21}]
-              :schema-flexibility :read
+{:databases [{:schema-flexibility :write
+              :keep-history? true
+              :name "users1"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users2"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users3"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users4"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users5"}
+             {:schema-flexibility :write
+              :keep-history? true
+              :name "users6"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions1"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions2"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions3"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions4"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions5"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions6"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions7"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions8"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions9"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions10"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions11"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions12"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions13"}
+             {:schema-flexibility :read
+              :keep-history? false
+              :name "sessions14"}
+             {:schema-flexibility :read
               :keep-history? false
               :name "sessions"}
              {:name "users"
