@@ -73,7 +73,8 @@
 (s/def ::keep-history? boolean?)
 (s/def ::schema-flexibility keyword?)
 
-(s/def ::database (s/keys :req-un [::name ::keep-history? ::schema-flexibility]))
+(s/def ::database (s/keys :req-un [::name] 
+                          :opt-un [::keep-history? ::schema-flexibility]))
 
 (s/def ::restorable-database (s/keys :req-un [::name ::keep-history? ::schema-flexibility ::backup-url]))
 (s/def :entity/vector (s/cat :e long? :a keyword? :v any? :t long? :added boolean?))

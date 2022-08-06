@@ -109,4 +109,5 @@
   (success {:backup-url (db/restore-database body)}))
   
 (defn delete-database [{{:keys [body]} :parameters}]
-  (success {:url (db/delete-database body)}))       
+  (db/delete-database body)
+  (success (list-databases-helper)))       
