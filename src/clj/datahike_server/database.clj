@@ -139,19 +139,19 @@
         (mount/start))
       (log/infof "Done"))))
    
-(defn delete-database [{:keys [db name]}]
+(defn delete-database [{:keys [name]}]
   (let [cfg { :store {:backend :firebase 
-                      :db db
+                      :db (-> config :server :firebase-url)
                       :root name
-                      :env "FIRETOMIC_FIREBASE_AUTH"}
+                      :env (-> config :server :auth-env)}
               :name name}]
+    (log/infof (str "Deleting database" name "..."))
     (when (d/database-exists? cfg) 
-      (log/infof "Deleting database...")
-      (d/delete-database cfg)
-      (log/infof "Done")
-      (-> 
-        (mount/swap {#'datahike-server.database/conns (dissoc conns name)})
-        (mount/start)))))
+      (d/delete-database cfg))
+    (log/infof "Done")
+    (-> 
+      (mount/swap {#'datahike-server.database/conns (dissoc conns name)})
+      (mount/start))))
     
 (defn cleanup-databases []
   (stop #'datahike-server.database/conns)

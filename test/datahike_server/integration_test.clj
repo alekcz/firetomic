@@ -52,7 +52,17 @@
                                :keep-history? true
                                :schema-flexibility :read}
                               {:headers {:authorization "token neverusethisaspassword"}})
-                (catch Exception _ "failed"))]
+                (catch Exception _ "failed"))
+          _a3 (api-request :post "/delete-database"
+                {:name "testing",
+                  :keep-history? true
+                  :schema-flexibility :read}
+                {:headers {:authorization "token neverusethisaspassword"}})
+          _a4 (:databases (api-request :post "/create-database"
+                              {:name "testing",
+                               :keep-history? true
+                               :schema-flexibility :read}
+                              {:headers {:authorization "token neverusethisaspassword"}}))]
       (is (true? (:error a2))))))      
 
 (deftest transact-test
