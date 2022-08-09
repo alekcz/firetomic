@@ -18,7 +18,7 @@ RUN clj -T:build uber
 
 
 # use clean base image
-FROM findepi/graalvm:java11
+FROM eclipse-temurin:17-jre-alpine
 
 COPY --from=builder /usr/firetomic/target/firetomic-standalone.jar /firetomic-standalone.jar
 COPY ./resources /resources

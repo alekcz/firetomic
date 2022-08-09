@@ -18,7 +18,7 @@
             :keep-history? false
             :name "default"
             :attribute-refs? false,
-            :cache-size 100000,
+            :cache-size 300,
             :index :datahike.index/hitchhiker-tree,
             :index-config {:index-b-factor 17, :index-data-node-size 300, :index-log-size 283}})
 
@@ -86,7 +86,8 @@
                       :env (-> config :server :auth-env)}
               :name name
               :keep-history? keep-history?
-              :schema-flexibility schema-flexibility}]
+              :schema-flexibility schema-flexibility
+              :cache-size (-> config :server :cache-size)}]
     (when (contains? conns name)
          (throw (ex-info
                  (str "A database with name '" name "' already exists. Database names on the transactor should be unique.")
@@ -126,7 +127,8 @@
                       :env (-> config :server :auth-env)}
               :name name
               :keep-history? keep-history?
-              :schema-flexibility schema-flexibility}]
+              :schema-flexibility schema-flexibility
+              :cache-size (-> config :server :cache-size)}]
     (when (d/database-exists? cfg) 
       (log/infof "Purging database...")
       (d/delete-database cfg))

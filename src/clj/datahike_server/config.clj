@@ -45,6 +45,7 @@
                         :token token
                         :dev-mode (bool-from-env :firetomic-dev-mode false)
                         :firebase-url (:firetomic-firebase-url env "http://localhost:9000")
+                        :cache-size (int-from-env :firetomic-cache 1000)
                         :auth-env "FIRETOMIC_FIREBASE_AUTH"}
                        (:server config-from-file))
         validated-server-config (if (s/valid? ::server-config server-config)
