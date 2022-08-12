@@ -2,7 +2,8 @@
   (:require [datahike-server.database :refer [conns] :as db]
             [datahike.api :as d]
             [datahike-firebase.core]
-            [datahike.core :as c]))
+            [datahike.core :as c]
+            [taoensso.timbre :as log]))
 
 (defn success
   ([data] {:status 200 :body data})
@@ -23,8 +24,8 @@
 (defn list-databases [_]
   (success (list-databases-helper)))
 
-(defn get-db-hash [{:keys [conn]}]
-  (success {:hash (hash @conn)}))
+(defn get-db [{:keys [conn]}]
+  (success (select-keys @conn [:meta :config :max-eid :max-tx :hash])))
 
 (defn cleanup-result [result]
   (-> result
@@ -33,19 +34,22 @@
       (update :tx-meta #(mapv (comp vec seq) %))))
 
 (defn transact [{{{:keys [tx-data tx-meta]} :body} :parameters conn :conn}]
-  (let [result (d/transact conn {:tx-data tx-data
-                                 :tx-meta tx-meta})]
-
+  (let [start (System/currentTimeMillis)
+        args {:tx-data tx-data
+              :tx-meta tx-meta}
+        _ (log/info "Transacting with arguments: " args)
+        result (d/transact conn args)]
     (-> result
         cleanup-result
         success)))
 
 (defn q [{{:keys [body]} :parameters conn :conn db :db}]
-  (success (into []
-                 (d/q {:query (:query body [])
-                       :args (concat [(or db @conn)] (:args body []))
-                       :limit (:limit body -1)
-                       :offset (:offset body 0)}))))
+  (let [args {:query (:query body [])
+              :args (concat [(or db @conn)] (:args body []))
+              :limit (:limit body -1)
+              :offset (:offset body 0)}]
+    (log/info "Querying with arguments: " (str args))
+    (success (into [] (d/q args)))))
 
 (defn pull [{{{:keys [selector eid]} :body} :parameters conn :conn db :db}]
   (success (d/pull (or db @conn) selector eid)))

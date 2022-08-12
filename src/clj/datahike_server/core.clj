@@ -17,8 +17,3 @@
   (log/set-level! (get-in config [:server :loglevel]))
   (log/debugf "Datahike Server Running!"))
 
-(comment
-
-  (mount/start)
-
-  (mount/stop))

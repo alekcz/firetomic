@@ -142,16 +142,16 @@
                :parameters {:body   (st/spec {:spec ::transactions
                                               :name "transactions"})
                             :header ::conn-header}
-               :middleware [middleware/token-auth middleware/auth]
+               :middleware [middleware/token-auth middleware/auth middleware/time-api-call]
                :handler    h/transact}}]
 
    ["/db"
     {:swagger {:tags ["API"]}
-     :get     {:operationId "DatabaseHash"
-               :summary "Get current database as a hash."
+     :get     {:operationId "Database"
+               :summary "Get current database data."
                :parameters {:header ::conn-header}
                :middleware [middleware/token-auth middleware/auth]
-               :handler    h/get-db-hash}}]
+               :handler    h/get-db}}]
 
    ["/q"
     {:swagger {:tags ["API"]}
@@ -160,7 +160,7 @@
                :parameters {:body   (st/spec {:spec ::query-request
                                               :name "query"})
                             :header ::db-header}
-               :middleware [middleware/token-auth middleware/auth]
+               :middleware [middleware/token-auth middleware/auth middleware/time-api-call]
                :handler    h/q}}]
 
    ["/pull"
