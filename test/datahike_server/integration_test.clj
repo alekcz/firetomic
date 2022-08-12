@@ -83,14 +83,17 @@
                                                   nil
                                                   {:headers {:authorization "token neverusethisaspassword"
                                                              :db-name       "sessions"}})]
+      (println db-data)                                                          
       (is (= #{:datahike/version
                :konserve/version
                :hitchhiker.tree/version
                :datahike/id
                :datahike/created-at}
              (set (keys meta))))
-      (is (= {:config  {:store              {:backend :mem
-                                             :id      "sessions"}
+      (is (= {:config  {:store              {:backend :firebase
+                                             :db "http://localhost:9000",
+                                             :env "FIRETOMIC_FIREBASE_AUTH",
+                                             :root "sessions"}
                         :schema-flexibility :read
                         :attribute-refs?    false
                         :keep-history?      false
@@ -109,14 +112,17 @@
                                                   nil
                                                   {:headers {:authorization "token neverusethisaspassword"
                                                              :db-name       "users"}})]
+      (println db-data)                                                          
       (is (= #{:datahike/version
                :konserve/version
                :hitchhiker.tree/version
                :datahike/id
                :datahike/created-at}
              (set (keys meta))))
-      (is (= {:config  {:store              {:backend :file
-                                             :path    "/tmp/dh-file"}
+      (is (= {:config  {:store              {:backend :firebase
+                                             :db "http://localhost:9000",
+                                             :env "FIRETOMIC_FIREBASE_AUTH",
+                                             :root "users"}
                         :name               "users"
                         :keep-history?      true
                         :attribute-refs?    false
