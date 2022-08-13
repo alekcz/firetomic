@@ -15,7 +15,7 @@
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-path (format "target/%s-%s.jar" (name lib) version))
-(def uber-file (format "%s-%s-standalone.jar" (name lib) version))
+(def uber-file (format "%s-standalone.jar" (name lib)))
 (def uber-path (format "target/%s" uber-file))
 (def image (format "docker.io/alekcz/firetomic:%s" version))
 (def latest-image (format "docker.io/alekcz/firetomic:latest"))

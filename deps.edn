@@ -7,7 +7,6 @@
   
   :deps {org.clojure/clojure       {:mvn/version "1.11.1"}
          alekcz/datahike-firebase  {:mvn/version "0.5.1506-20220812.094725-1"}
-         io.replikativ/superv.async                  {:mvn/version "0.3.43"}
          io.replikativ/datahike    {:mvn/version "0.5.1506"}
          buddy/buddy-auth          {:mvn/version "3.0.323"}
          ring/ring                 {:mvn/version "1.9.5"}
@@ -37,8 +36,7 @@
            :install {:ns-default datahike-server.install
                       :exec-fn install }
 
-           :run {:ns-default datahike-server.core
-                  :exec-fn -main }
+           :run {:main-opts ["-m" "datahike-server.core"]}
 
            :test {:extra-paths ["test"]
                   :extra-deps  {clj-http/clj-http      {:mvn/version "3.12.3"}

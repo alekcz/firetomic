@@ -22,7 +22,7 @@ Or you could deploy to Heroku
 
 Run firetomic in locally from the source:
 
-`clj -X:run`
+`clj -M:run`
 
 Or you could run the docker image like so:
 
