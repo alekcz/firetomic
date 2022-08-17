@@ -7,10 +7,8 @@
   
   :deps {org.clojure/clojure       {:mvn/version "1.11.1"}
          alekcz/datahike-firebase  {:mvn/version "0.5.1506-20220812.094725-1"}
-         io.replikativ/datahike    {:mvn/version "0.5.1506"}
          buddy/buddy-auth          {:mvn/version "3.0.323"}
          ring/ring                 {:mvn/version "1.9.5"}
-         http-kit/http-kit         {:mvn/version "2.5.3"}
          metosin/reitit            {:mvn/version "0.5.18"}
          ring-cors/ring-cors       {:mvn/version "0.1.13"}
          com.taoensso/timbre       {:mvn/version "5.2.1"}
@@ -19,7 +17,7 @@
          metosin/spec-tools        {:mvn/version "0.10.5"}
          com.cemerick/url          {:mvn/version "0.1.1"}}
 
- :paths ["src/clj"]
+ :paths ["src/clj" "target/classes"]
 
  :aliases {:kaocha {:extra-paths ["test"]
                     :extra-deps  {clj-http/clj-http   {:mvn/version "3.12.3"}

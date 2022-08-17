@@ -94,3 +94,11 @@
           response (handler request)]
       (log/info "Time elapsed: " (- (System/currentTimeMillis) start) " ms")
       response)))
+
+(defn logger
+  [handler]
+  (fn [request]
+    (log/trace "Request: " request)
+    (let [response (handler request)]
+      (log/trace "Request: " response)
+      response)))

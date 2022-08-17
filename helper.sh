@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-clj -M:run
+java -jar target/firetomic-standalone.jar

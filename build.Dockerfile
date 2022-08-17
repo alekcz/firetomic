@@ -13,12 +13,12 @@ RUN apt update -y && apt install -y \
 
 COPY . /usr/firetomic
 WORKDIR /usr/firetomic
-RUN clj -X:install
+RUN clj -P
 RUN clj -T:build uber
 
 
 # use clean base image
-FROM eclipse-temurin:17-jre-alpine
+FROM findepi/graalvm:java11
 
 COPY --from=builder /usr/firetomic/target/firetomic-standalone.jar /firetomic-standalone.jar
 COPY ./resources /resources

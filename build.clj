@@ -10,7 +10,7 @@
 
 (def lib 'alekcz/firetomic)
 (def base (slurp "resources/VERSION"))
-(def version (format (str base "-a.%s") (b/git-count-revs nil)))
+(def version (format (str base ".%s") (b/git-count-revs nil)))
 (def current-commit (gh/current-commit))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))

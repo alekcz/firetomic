@@ -1,6 +1,5 @@
 (ns ^:integration datahike-server.integration-test
   (:require [clojure.test :refer [deftest is testing use-fixtures]]
-            [datahike-server.install :as is]
             [datahike-server.config :as dc]
             [clj-http.client :as client]     
             [datahike-server.test-utils :refer [api-request setup-db] :as utils]))
@@ -21,10 +20,6 @@
                           :db-name db}}))
 
 (use-fixtures :once setup-db)
-
-(deftest install-test
-  (testing "that deps will be forced to download in docker"
-    (is (= "dependencies downloaded" (with-out-str (is/install nil))))))
 
 (deftest swagger-test
   (testing "Swagger Json"

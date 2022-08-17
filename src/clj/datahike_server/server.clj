@@ -263,6 +263,7 @@
                             middleware/wrap-server-exception
                             middleware/wrap-db-connection
                             middleware/wrap-db-history
+                            middleware/logger
                             muuntaja/format-request-middleware
                             coercion/coerce-response-middleware
                             coercion/coerce-request-middleware
