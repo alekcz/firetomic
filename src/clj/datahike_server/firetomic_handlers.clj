@@ -36,7 +36,6 @@
       (success {:name (:name body) :connected (some? connection) :created created?}))))
   
 (defn remove-database [{{:keys [body]} :parameters}]
-  (println conns)
   (let [status (fb/delete-database body config/config)]
     (-> 
       (mount/swap {#'datahike-server.database/conns (dissoc conns (:name body))})
