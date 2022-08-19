@@ -9,6 +9,7 @@
     [com.google.cloud.tools.jib.api.buildplan AbsoluteUnixPath Port]))
 
 (def lib 'alekcz/firetomic)
+
 (def version (format "0.5.1506-v0.1-a.%s" (b/git-count-revs nil)))
 (def current-commit (gh/current-commit))
 (def class-dir "target/classes")
@@ -17,7 +18,7 @@
 (def uber-file (format "%s-%s-standalone.jar" (name lib) version))
 (def uber-path (format "target/%s" uber-file))
 (def image (format "docker.io/alekcz/firetomic:%s" version))
-(def latest-image (format "docker.io/firetomic/firetomic:latest"))
+(def latest-image (format "docker.io/alekcz/firetomic:latest"))
 
 
 (defn get-version
@@ -112,10 +113,10 @@
   [{:keys [docker-login docker-password]}]
   (if-not (and docker-login docker-password)
     (println "Docker credentials missing.")
-    (let [container-builder (-> (Jib/from "gcr.io/distroless/java17-debian11")
+    (let [container-builder (-> (Jib/from "findepi/graalvm:java11")
                                 (.addLayer [(Paths/get uber-path (into-array String[]))] (AbsoluteUnixPath/get "/"))
-                                (.setProgramArguments [(format "/%s" uber-file)])
-                                (.addExposedPort (Port/tcp 3000)))]
+                                (.setProgramArguments ["java" "-jar" (format "/%s" uber-file)])
+                                (.addExposedPort (Port/tcp 4000)))]
        (.containerize
          container-builder
          (Containerizer/to

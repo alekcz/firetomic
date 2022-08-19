@@ -1,7 +1,7 @@
-FROM gcr.io/distroless/java17-debian11
+FROM findepi/graalvm:java11
 
 COPY target/datahike-server-*-standalone.jar /
 
-EXPOSE 3000
+EXPOSE 4000
 
-CMD ["/datahike-server-standalone.jar"]
+CMD ["java" "-jar" "/datahike-server-standalone.jar"]
