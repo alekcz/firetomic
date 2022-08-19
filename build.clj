@@ -116,7 +116,7 @@
   [{:keys [docker-login docker-password]}]
   (if-not (and docker-login docker-password)
     (println "Docker credentials missing.")
-    (let [container-builder (-> (Jib/from "findepi/graalvm:java11")
+    (let [container-builder (-> (Jib/from "gcr.io/distroless/java17-debian11")
                                 (.addLayer [(Paths/get uber-path (into-array String[]))] (AbsoluteUnixPath/get "/"))
                                 ;; firetomic customization start
                                 (.setProgramArguments ["java" "-jar" (format "/%s" uber-file)])
