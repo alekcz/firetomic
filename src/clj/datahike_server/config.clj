@@ -44,7 +44,6 @@
         server-config (merge
                        ;; firetomic customization start
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000))
-                        :join? (bool-from-env :firetomic-join? false)
                         :loglevel (keyword (:firetomic-log-level env :info))
                         :firebase-url (:firetomic-firebase-url env "http://localhost:9000")
                         :cache-size (int-from-env :firetomic-cache 1000)

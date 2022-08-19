@@ -20,7 +20,9 @@
    [clojure.spec.alpha :as s]
    [taoensso.timbre :as log]
    [mount.core :refer [defstate]]
-   [ring.adapter.jetty :refer [run-jetty]]
+   ;; firetomic customization start
+   [org.httpkit.server :refer [run-server server-stop!]]       
+   ;; firetomic customization end
    [clojure.pprint :refer [pprint]]
    [spec-tools.core :as st]))
 
@@ -251,7 +253,9 @@
 
 (def app
   (-> (ring/ring-handler
+       ;; firetomic customization start     
        (ring/router (concat routes fh/routes) route-opts)
+       ;; firetomic customization end
        (ring/routes
         (swagger-ui/create-swagger-ui-handler
          {:path   "/"
@@ -262,10 +266,12 @@
                  :access-control-allow-methods [:get :put :post :delete])))
 
 (defn start-server [config]
-  (run-jetty app (:server config)))
-
+  ;; firetomic customization start     
+  (run-server app (merge {:legacy-return-value? false} (:server config))))
+  ;; firetomic customization start     
+       
 (defstate server
   :start (do
            (log/debug "Starting server")
            (start-server config/config))
-  :stop (.stop server))
+  :stop (server-stop! server))

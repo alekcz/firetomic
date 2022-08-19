@@ -67,7 +67,6 @@ to configure both Datahike and the server.
               :keep-history? true
               :schema-flexibility :write}]
  :server {:port  3333
-          :join? false
           :loglevel :info
           :firebase-url "https://project-id.firebaseio.com/firetomic" 
           :auto-load true
