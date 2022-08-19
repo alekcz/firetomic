@@ -45,10 +45,10 @@
 (def routes
   [["/ping"
     {:get {:no-doc  true
-           :handler (fn [_request] {:status 200 :body "pew pew"})}}]
+           :handler (fn [_request] {:status 200 :body {:message "pew pew"}})}}]
 
    ["/hello"
-    {:get {:handler (fn [_request] {:status 200 :body "pew pew"})}}]
+    {:get {:handler (fn [_request] {:status 200 :body {:message "pew pew"}})}}]
 
    ["/create-database"
     {:swagger {:tags ["API"]}
