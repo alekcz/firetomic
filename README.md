@@ -94,7 +94,7 @@ FIRETOMIC_TOKEN           | --
 FIRETOMIC_NAME            | --
 FIRETOMIC_FIREBASE_URL    | http://localhost:9000
 FIRETOMIC_FIREBASE_AUTH   | --
-
+FIRETOMIC_CACHE           | 100000
 
 ### Authentication
 

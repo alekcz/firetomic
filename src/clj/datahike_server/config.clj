@@ -22,8 +22,8 @@
 (s/def ::firebase-url (s/or :s string? :n nil?))
 
 
-(s/def ::server-config (s/keys :req-un [::port ::join? ::loglevel ::firebase-url]
-                               :opt-un [::dev-mode ::token ::auth-env]))
+(s/def ::server-config (s/keys :req-un [::port ::loglevel ::firebase-url]
+                               :opt-un [::dev-mode ::token ::join? ::auth-env]))
 
 ;; firetomic customization end
 
@@ -46,7 +46,7 @@
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000))
                         :loglevel (keyword (:firetomic-log-level env :info))
                         :firebase-url (:firetomic-firebase-url env "http://localhost:9000")
-                        :cache-size (int-from-env :firetomic-cache 1000)
+                        :cache-size (int-from-env :firetomic-cache 100000)
                         :auto-load (bool-from-env :firetomic-auto-load false)
                         :auth-env "FIRETOMIC_FIREBASE_AUTH"
                         :dev-mode (bool-from-env :firetomic-dev-mode false)}
