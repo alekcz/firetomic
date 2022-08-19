@@ -12,7 +12,7 @@ We both get credits for DigitalOcean if you end using their services so be a mat
 
 Or you could deploy to Heroku  
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/alekcz/firetomic/tree/main)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/alekcz/firetomic/tree/refactor)
 
 ## Build Firetomic
 
