@@ -119,7 +119,7 @@
     (let [container-builder (-> (Jib/from "gcr.io/distroless/java17-debian11")
                                 (.addLayer [(Paths/get uber-path (into-array String[]))] (AbsoluteUnixPath/get "/"))
                                 ;; firetomic customization start
-                                (.setProgramArguments ["java" "-jar" (format "/%s" uber-file)])
+                                (.setProgramArguments [(format "/%s" uber-file)])
                                 (.addExposedPort (Port/tcp 4000)))]
                                 ;; firetomic customization end
        (.containerize
