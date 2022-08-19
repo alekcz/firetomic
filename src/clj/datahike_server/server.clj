@@ -1,6 +1,7 @@
 (ns datahike-server.server
   (:require
    [datahike-server.handlers :as h]
+   [datahike-server.firetomic_handlers :as fh]
    [datahike-server.config :as config]
    [datahike-server.middleware :as middleware]
    [reitit.ring :as ring]
@@ -250,7 +251,7 @@
 
 (def app
   (-> (ring/ring-handler
-       (ring/router routes route-opts)
+       (ring/router (concat routes fh/routes) route-opts)
        (ring/routes
         (swagger-ui/create-swagger-ui-handler
          {:path   "/"

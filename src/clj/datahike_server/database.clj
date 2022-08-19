@@ -1,6 +1,10 @@
 (ns datahike-server.database
   (:require [mount.core :as mount :refer [defstate]]
             [taoensso.timbre :as log]
+            ;; firetomic customization start
+            [datahike-server.firebase :as fb]
+            [datahike-firebase.core]
+            ;; firetomic customization end
             [datahike-server.config :as config]
             [datahike.api :as d])
   (:import [java.util UUID]))
@@ -35,7 +39,7 @@
     (d/release conn)))
 
 (defstate conns
-  :start (init-connections config/config)
+  :start (init-connections (fb/connect config/config))
   :stop (release-conns conns))
 
 (defn cleanup-databases []

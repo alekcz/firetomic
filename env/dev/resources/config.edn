@@ -1,15 +1,14 @@
-{:databases [{:store {:backend :mem
-                      :id "sessions"}
+{:databases [{:store {:backend :firebase}
               :schema-flexibility :read
               :keep-history? false
               :name "sessions"}
-             {:store {:backend :file
-                      :path "/tmp/dh-file"}
+             {:store {:backend :firebase}
               :name "users"
               :keep-history? true
               :schema-flexibility :write}]
  :server {:port  4444
           :join? false
           :loglevel :info
+          :firebase-url "http://localhost:9000" 
           :dev-mode true
           :token :securerandompassword}}

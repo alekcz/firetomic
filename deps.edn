@@ -1,5 +1,5 @@
 {:deps {org.clojure/clojure     {:mvn/version "1.11.1"}
-        io.replikativ/datahike  {:mvn/version "0.5.1506"}
+        alekcz/datahike-firebase{:mvn/version "0.5.1506-20220812.094725-1"}
         buddy/buddy-auth        {:mvn/version "3.0.323"}
         ring/ring-core          {:mvn/version "1.9.5"}
         ring/ring-jetty-adapter {:mvn/version "1.9.5"}
@@ -18,6 +18,8 @@
                     :main-opts   ["-m" "kaocha.runner"]
                     :exec-fn     kaocha.runner/exec-fn
                     :exec-args   {}}
+
+           :run {:main-opts   ["-m" "datahike-server.core"]}
 
            :dev {:extra-paths ["env/dev"]
                  :extra-deps  {org.clojure/tools.namespace {:mvn/version "1.2.0"}

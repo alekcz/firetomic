@@ -1,0 +1,25 @@
+spec:
+  name: firetomic
+  services:
+  - name: firetomic
+    git:
+      branch: main
+      repo_clone_url: https://github.com/alekcz/firetomic.git
+    dockerfile_path: /Dockerfile
+    envs:
+    - key: FIRETOMIC_FIREBASE_URL
+      scope: RUN_TIME
+      value: https://project-id.firebaseio.com/prod
+    - key: FIRETOMIC_NAME
+      scope: RUN_TIME
+      value: firetomic-1
+    - key: FIRETOMIC_DEV_MODE
+      scope: RUN_TIME
+      value: make-this-true-for-testing
+    - key: FIRETOMIC_TOKEN
+      scope: RUN_TIME
+      value: a-super-secure-long-and-unguessable-token
+    - key: FIRETOMIC_FIREBASE_AUTH
+      scope: RUN_TIME
+      value: paste the service account token from firebase here
+    

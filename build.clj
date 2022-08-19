@@ -8,16 +8,17 @@
     [com.google.cloud.tools.jib.api Jib Containerizer RegistryImage TarImage]
     [com.google.cloud.tools.jib.api.buildplan AbsoluteUnixPath Port]))
 
-(def lib 'io.replikativ/datahike-server)
-(def version (format "0.1.%s" (b/git-count-revs nil)))
+(def lib 'alekcz/firetomic)
+(def version (format "0.5.1506-v0.1-a.%s" (b/git-count-revs nil)))
 (def current-commit (gh/current-commit))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-path (format "target/%s-%s.jar" (name lib) version))
 (def uber-file (format "%s-%s-standalone.jar" (name lib) version))
 (def uber-path (format "target/%s" uber-file))
-(def image (format "docker.io/replikativ/datahike-server:%s" version))
-(def latest-image (format "docker.io/replikativ/datahike-server:latest"))
+(def image (format "docker.io/alekcz/firetomic:%s" version))
+(def latest-image (format "docker.io/firetomic/firetomic:latest"))
+
 
 (defn get-version
   [_]

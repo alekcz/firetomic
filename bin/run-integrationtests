@@ -19,6 +19,11 @@ function test_middleware() {
 function test_dev_mode() {
     ./bin/kaocha --focus datahike-server.setup-test
 }
+# firetomic customization start
+function test_firebase() {
+    ./bin/kaocha --focus datahike-server.firebase-test
+}
+# firetomic customization start
 function teardown() {
     mv resources/config.edn.tmp resources/config.edn &> /dev/null | rm resources/config.edn
 }
@@ -27,3 +32,6 @@ setup
 test_auth
 test_middleware
 test_dev_mode
+# firetomic customization start
+test_firebase
+# firetomic customization start

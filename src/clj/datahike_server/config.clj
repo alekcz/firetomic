@@ -16,8 +16,16 @@
 (s/def ::loglevel #{:trace :debug :info :warn :error :fatal :report})
 (s/def ::token keyword?)
 (s/def ::dev-mode boolean?)
-(s/def ::server-config (s/keys :req-un [::port ::join? ::loglevel]
-                               :opt-un [::dev-mode ::token]))
+
+;; firetomic customization start
+(s/def ::auth-env (s/or :s string? :n nil?))
+(s/def ::firebase-url (s/or :s string? :n nil?))
+
+
+(s/def ::server-config (s/keys :req-un [::port ::join? ::loglevel ::firebase-url]
+                               :opt-un [::dev-mode ::token ::auth-env]))
+
+;; firetomic customization end
 
 (def config-file-path "resources/config.edn")
 
@@ -34,14 +42,22 @@
   (let [arg-config (cond-> config
                      (string? config) load-config-file)
         server-config (merge
-                       {:port (int-from-env :datahike-server-port 3000)
-                        :join? (bool-from-env :datahike-server-join? false)
-                        :loglevel (keyword (:datahike-server-loglevel env :info))
-                        :dev-mode (bool-from-env :datahike-server-dev-mode false)}
+                       ;; firetomic customization start
+                       {:port  (int-from-env :firetomic-port 4000)
+                        :join? (bool-from-env :firetomic-join? false)
+                        :loglevel (keyword (:firetomic-log-level env :info))
+                        :firebase-url (:firetomic-firebase-url env "http://localhost:9000")
+                        :cache-size (int-from-env :firetomic-cache 1000)
+                        :auto-load (bool-from-env :firetomic-auto-load false)
+                        :auth-env "FIRETOMIC_FIREBASE_AUTH"
+                        :dev-mode (bool-from-env :firetomic-dev-mode false)}
+                       ;; firetomic customization end
                        (:server arg-config))
-        token-config (if-let [token (keyword (:datahike-server-token env))]
+                      ;; firetomic customization start                                             
+        token-config (if-let [token (keyword (:firetomic-token env))]
                        (merge
-                        {:token (keyword (:datahike-server-token env))}
+                        {:token token}
+                      ;; firetomic customization end
                         server-config)
                        server-config)
         validated-server-config (if (s/valid? ::server-config token-config)
