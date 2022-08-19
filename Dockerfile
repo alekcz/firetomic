@@ -1,1 +1,1 @@
-FROM  alekcz/firetomic:latest
+FROM alekcz/firetomic:latest
