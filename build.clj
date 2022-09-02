@@ -10,7 +10,7 @@
 
 ;; firetomic customization start
 (def lib 'alekcz/firetomic)
-(def version (format "0.5.1506-v0.1-a.%s" (b/git-count-revs nil)))
+(def version (format "0.5.1510-v0.1-a.%s" (b/git-count-revs nil)))
 ;; firetomic customization end
 (def current-commit (gh/current-commit))
 (def class-dir "target/classes")
