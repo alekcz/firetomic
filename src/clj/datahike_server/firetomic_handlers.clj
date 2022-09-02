@@ -11,9 +11,10 @@
 (s/def ::keep-history? boolean?)
 (s/def ::delete? boolean?)
 (s/def ::schema-flexibility (s/or :keyword keyword? :string string?))
+(s/def ::initial-tx (s/coll-of map?))
 
 (s/def ::database (s/keys :req-un [::name] 
-                          :opt-un [::keep-history? ::schema-flexibility]))
+                          :opt-un [::keep-history? ::schema-flexibility ::initial-tx]))
 
 (s/def ::removal (s/keys  :req-un [::name] 
                           :opt-un [::delete?]))

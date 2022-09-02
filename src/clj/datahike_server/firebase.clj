@@ -52,7 +52,7 @@
     (println (-> config :server :auto-load) existing)
     final-config))
 
-(defn add-database [{:keys [name keep-history? schema-flexibility]} config]
+(defn add-database [{:keys [name keep-history? schema-flexibility initial-tx]} config]
   (let [cfg { :store {:backend :firebase 
                       :db (-> config :server :firebase-url)
                       :root name
@@ -60,11 +60,12 @@
               :name name
               :keep-history? keep-history?
               :schema-flexibility (keyword schema-flexibility)
-              :cache-size (-> config :server :cache-size)}
+              :cache-size (-> config :server :cache-size)
+              :initial-tx initial-tx}
         exists? (d/database-exists? cfg)]
     (when-not exists?
       (log/infof "Creating database...")
-      (d/create-database cfg)  
+      (d/create-database cfg)
       (log/infof "Done"))
     [(not exists?) (d/connect cfg)]))
 

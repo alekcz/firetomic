@@ -26,8 +26,10 @@
           (api-request :get "/databases"
                         nil
                         {}))))
-  (let [res (api-request :post "/create-database" {:name "users" :schema-flexibility "write" :keep-history? false})]
-    (println res)
+  (let [res (api-request :post "/create-database" 
+              {:name "users" 
+               :schema-flexibility "write" 
+               :keep-history? false })]
     (is (false? (:created res)))
     (is (true? (:connected res)))                      
     (is (= {:databases
@@ -50,4 +52,11 @@
           (api-request :get "/databases"
                         nil
                         {}))))
+    (let [schema [{:db/ident :user/name  :db/valueType :db.type/string :db/cardinality :db.cardinality/one}]
+          _  (api-request :post "/create-database" 
+                {:name "created-db" 
+                 :schema-flexibility "read" 
+                 :keep-history? false 
+                 :initial-tx schema})]
+      (is (= 3 (count (api-request :post "/datoms" {:index :eavt} {:headers {:db-name "created-db"}})))))
   (mount/stop))

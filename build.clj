@@ -3,6 +3,7 @@
     [borkdude.gh-release-artifact :as gh]
     [clojure.tools.build.api :as b]
     [deps-deploy.deps-deploy :as dd])
+  (:refer-clojure :exclude [compile])
   (:import
     [java.nio.file Paths]
     [com.google.cloud.tools.jib.api Jib Containerizer RegistryImage TarImage]
