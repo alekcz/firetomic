@@ -49,7 +49,6 @@
         final-dbs (concat (:databases config) existing)
         full-config (assoc config :databases final-dbs);(conj final-dbs memdb))
         final-config (prepare-databases full-config)]
-    (println (-> config :server :auto-load) existing)
     final-config))
 
 (defn add-database [{:keys [name keep-history? schema-flexibility initial-tx]} config]

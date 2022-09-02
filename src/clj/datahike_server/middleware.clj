@@ -78,6 +78,7 @@
       (handler request)
       (catch ExceptionInfo e
         (let [cause (:cause (.getData e))]
+          (.printStackTrace e)
           {:status (cause->status-code cause)
            :body {:message (.getMessage e)}})))))
 
