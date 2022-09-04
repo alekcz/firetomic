@@ -1,2 +1,2 @@
 clj -T:build clean
-clj -M:run
+clj -M:run -J-verbosegc

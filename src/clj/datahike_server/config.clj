@@ -17,7 +17,7 @@
 (s/def ::token keyword?)
 (s/def ::dev-mode boolean?)
 
-;; firetomic customization start
+;; customization start
 (s/def ::auth-env (s/or :s string? :n nil?))
 (s/def ::firebase-url (s/or :s string? :n nil?))
 
@@ -25,7 +25,7 @@
 (s/def ::server-config (s/keys :req-un [::port ::loglevel ::firebase-url]
                                :opt-un [::dev-mode ::token ::join? ::auth-env]))
 
-;; firetomic customization end
+;; customization end
 
 (def config-file-path "resources/config.edn")
 
@@ -42,7 +42,7 @@
   (let [arg-config (cond-> config
                      (string? config) load-config-file)
         server-config (merge
-                       ;; firetomic customization start
+                       ;; customization start
                        {:port (int-from-env :port (int-from-env :firetomic-port 4000))
                         :loglevel (keyword (:firetomic-log-level env :info))
                         :firebase-url (:firetomic-firebase-url env "http://localhost:9000")
@@ -50,13 +50,13 @@
                         :auto-load (bool-from-env :firetomic-auto-load false)
                         :auth-env "FIRETOMIC_FIREBASE_AUTH"
                         :dev-mode (bool-from-env :firetomic-dev-mode false)}
-                       ;; firetomic customization end
+                       ;; customization end
                        (:server arg-config))
-                      ;; firetomic customization start                                             
+                      ;; customization start                                             
         token-config (if-let [token (keyword (:firetomic-token env))]
                        (merge
                         {:token token}
-                      ;; firetomic customization end
+                      ;; customization end
                         server-config)
                        server-config)
         validated-server-config (if (s/valid? ::server-config token-config)

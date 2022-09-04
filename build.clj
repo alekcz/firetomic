@@ -9,20 +9,20 @@
     [com.google.cloud.tools.jib.api Jib Containerizer RegistryImage TarImage]
     [com.google.cloud.tools.jib.api.buildplan AbsoluteUnixPath Port]))
 
-;; firetomic customization start
+;; customization start
 (def lib 'alekcz/firetomic)
 (def version (format "0.5.1510-v0.1-a.%s" (b/git-count-revs nil)))
-;; firetomic customization end
+;; customization end
 (def current-commit (gh/current-commit))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-path (format "target/%s-%s.jar" (name lib) version))
 (def uber-file (format "%s-%s-standalone.jar" (name lib) version))
 (def uber-path (format "target/%s" uber-file))
-;; firetomic customization start
+;; customization start
 (def image (format "docker.io/alekcz/firetomic:%s" version))
 (def latest-image (format "docker.io/alekcz/firetomic:latest"))
-;; firetomic customization end
+;; customization end
 
 
 (defn get-version
@@ -119,10 +119,10 @@
     (println "Docker credentials missing.")
     (let [container-builder (-> (Jib/from "gcr.io/distroless/java17-debian11")
                                 (.addLayer [(Paths/get uber-path (into-array String[]))] (AbsoluteUnixPath/get "/"))
-                                ;; firetomic customization start
+                                ;; customization start
                                 (.setProgramArguments [(format "/%s" uber-file)])
                                 (.addExposedPort (Port/tcp 4000)))]
-                                ;; firetomic customization end
+                                ;; customization end
        (.containerize
          container-builder
          (Containerizer/to

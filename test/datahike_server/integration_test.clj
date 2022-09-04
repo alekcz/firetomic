@@ -6,15 +6,21 @@
             [datahike-server.json-utils :as ju]
             [datahike-server.test-utils :refer [api-request] :as utils]))
 
-(def ^:private default-cfg {:store {:backend :mem
-                                    :id "default"}
+;; customization start
+(def firebase-url "http://localhost:9000")
+;; customization end
+            
+(def ^:private default-cfg {:store {:backend :firebase
+                                    :db firebase-url
+                                    :root "default"
+                                    :env "FIRETOMIC_FIREBASE_AUTH"}
                             :schema-flexibility :write
                             :keep-history? true
                             :name "default"})
 
 (defn- rename-cfg [cfg new-name]
   (-> (assoc cfg :name new-name)
-      (assoc-in [:store :id] new-name)))
+      (assoc-in [:store :root] new-name)))
 
 (def ^:private test-cfg
   {:databases [default-cfg
@@ -28,6 +34,9 @@
             :join? false
             :loglevel :info
             :dev-mode false
+            ;; customization start
+            :firebase-url firebase-url
+            ;; customization end
             :token :neverusethisaspassword}})
 
 (def ^:private test-cfg-headers

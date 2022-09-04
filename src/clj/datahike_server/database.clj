@@ -1,10 +1,10 @@
 (ns datahike-server.database
   (:require [mount.core :as mount :refer [defstate]]
             [taoensso.timbre :as log]
-            ;; firetomic customization start
+            ;; customization start
             [datahike-server.firebase :as fb]
             [datahike-firebase.core]
-            ;; firetomic customization end
+            ;; customization end
             [datahike-server.config :as config]
             [datahike.api :as d])
   (:import [java.util UUID]))
