@@ -8,7 +8,6 @@
 
 ;; customization start
 (def firebase-url "http://localhost:9000")
-;; customization end
             
 (def ^:private default-cfg {:store {:backend :firebase
                                     :db firebase-url
@@ -21,6 +20,7 @@
 (defn- rename-cfg [cfg new-name]
   (-> (assoc cfg :name new-name)
       (assoc-in [:store :root] new-name)))
+;; customization end
 
 (def ^:private test-cfg
   {:databases [default-cfg
